@@ -1,0 +1,2 @@
+-Paste the file into the instance directory
+-Open terminal and run: python converter.py <instancename>
