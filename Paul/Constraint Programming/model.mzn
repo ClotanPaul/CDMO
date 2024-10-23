@@ -1,33 +1,57 @@
+include "globals.mzn";
 % Parameters
-int: m;                    % number of vehicles
-int: n;                    % number of distribution points
-array[1..m] of int: l;      % vehicle capacities
-array[1..n] of int: s;      % demand of each distribution point
-array[1..n+1, 1..n+1] of int: D;  % distance matrix (n+1 corresponds to the depot)
+int: m;                          % number of courriers
+int: n;                          % number of distribution points
+array[1..m] of int: l;           % vehicle capacities
+array[1..n] of int: s;           % demand of each distribution point
+array[1..n+1, 1..n+1] of int: D; % distance matrix (n+1 corresponds to the origin)
 
 % Decision variables
-array[1..m, 1..n] of var 0..1: x; % x[i,j] = 1 if vehicle i visits distribution point j
+array[1..m, 1..n+1] of var 1..n+1: x; % x[i, j1] = j2 if courier i goes from j1 to j2, j1 otherwise
+
+array[1..m] of var 0..10000000000: y; % y[i] is the total distance travelled by courier i
+var 0..10000000000: traveled_max_dist;
 
 % Objective: Minimize the total travel distance
-var int: total_distance = sum(i in 1..m, j in 1..n, k in 1..n+1)(x[i,j] * D[j,k]);
+constraint
+    forall(i in 1..m) (
+        y[i] = sum([ D[j1, x[i, j1]] | j1 in 1..n+1 where x[i, j1] != j1])
+    );
+constraint
+    traveled_max_dist = max(y);
 
 % Constraints
-constraint forall(i in 1..m)(
-  sum(j in 1..n)(x[i,j] * s[j]) <= l[i] % Vehicle capacity constraints
-);
+constraint
+    forall(i in 1..m)(
+        if x[i, n+1] != n+1 then count([x[i, j1] | j1 in 1..n], n+1, 1) 
+        else forall(k in 1..n) (x[i, k] = k) endif
+    );
 
-constraint forall(j in 1..n)(
-  sum(i in 1..m)(x[i,j]) = 1 % Each distribution point must be visited by exactly one vehicle
-);
+%constraint
+%    forall(i in 1..m)(
+%        (x[i, n+1] != n+1) -> count([x[i, j1] | j1 in 1..n], n+1) = 1
+%    );
 
-constraint forall(i in 1..m)(
-  sum(j in 1..n)(x[i,j]) > 0 % Each vehicle must visit at least one distribution point
-);
+constraint
+    forall(i in 1..m)(
+        sum([s[j1] | j1 in 1..n where x[i, j1] != j1]) <= l[i]   %capacity constraint
+    );
 
+constraint
+    forall(j in 1..n) (
+        sum([x[i, j] != j | i in 1..m]) == 1  %exactly one courier per package
+    );
+
+
+constraint
+    forall(i in 1..m)(
+        subcircuit([x[i, j] | j in 1..n+1])  % Use the subcircuit global constraint for each courier's route
+    );
 % Solve the model
-solve minimize total_distance;
+solve :: int_search(x, first_fail, indomain_min) minimize traveled_max_dist;
+
 
 output [
-  "totaldistance: ", show(total_distance), "\n",
+  "totaldistance: ", show(traveled_max_dist), "\n",
   "Assignment: ", show(x), "\n"
 ];

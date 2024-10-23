@@ -1,0 +1,20 @@
+{
+ "gecode": {
+  "runtime": 300,
+  "optimal": "False",
+  "obj": 328,
+  "sol": "[[14], [14], [14], [14], [14], [14], [14], [14], [2, 7, 12, 9, 6, 3], [11, 1, 4, 13, 8, 10, 5]]",
+  "time": "0:00:57.362000",
+  "initTime": "0:00:00.067484",
+  "solveTime": "0:04:59.775000",
+  "solutions": 57,
+  "variables": 2431,
+  "propagators": 2524,
+  "propagations": 1275614507,
+  "nodes": 13318202,
+  "failures": 6656403,
+  "restarts": 0,
+  "peakDepth": 255,
+  "nSolutions": 57
+ }
+}
