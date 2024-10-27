@@ -29,6 +29,7 @@ constraint
         else forall(k in 1..n) (x[i, k] = k) endif
     );
 
+
 %constraint
 %    forall(i in 1..m)(
 %        (x[i, n+1] != n+1) -> count([x[i, j1] | j1 in 1..n], n+1) = 1
@@ -43,6 +44,13 @@ constraint
     forall(j in 1..n) (
         sum([x[i, j] != j | i in 1..m]) == 1  %exactly one courier per package
     );
+
+%if two couriers have the same load, we make sure they cannot have the paths reversed between them.
+constraint
+    forall(i in 1..m-1, z in i+1..m where l[i] == l[z]) (
+        lex_lesseq([x[i, k] | k in 1..n], [x[z, k] | k in 1..n])
+    );
+
 
 
 constraint
