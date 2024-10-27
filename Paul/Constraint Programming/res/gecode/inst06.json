@@ -1,12 +1,12 @@
 {
  "gecode": {
-  "runtime": 175,
+  "runtime": 209,
   "optimal": true,
   "obj": 322,
   "sol": "[[9], [9], [9], [8], [5, 7], [6, 3, 4, 1, 2]]",
-  "time": "0:00:00.449000",
-  "initTime": "0:00:00.045337",
-  "solveTime": "0:02:54.646000",
+  "time": "0:00:00.499000",
+  "initTime": "0:00:00.035707",
+  "solveTime": "0:03:29.330000",
   "solutions": 11,
   "variables": 979,
   "propagators": 1035,

@@ -9,8 +9,10 @@ array[1..n+1, 1..n+1] of int: D; % distance matrix (n+1 corresponds to the origi
 % Decision variables
 array[1..m, 1..n+1] of var 1..n+1: x; % x[i, j1] = j2 if courier i goes from j1 to j2, j1 otherwise
 
-array[1..m] of var 0..10000000000: y; % y[i] is the total distance travelled by courier i
-var 0..10000000000: traveled_max_dist;
+int: sum_of_row_max = sum([ max([D[i, j] | j in 1..n+1]) | i in 1..n+1 ]);
+
+array[1..m] of var 0..sum_of_row_max: y; % y[i] is the total distance travelled by courier i
+var 0..sum_of_row_max: traveled_max_dist;
 
 % Objective: Minimize the total travel distance
 constraint
