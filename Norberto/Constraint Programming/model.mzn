@@ -48,7 +48,7 @@ constraint
 %if two couriers have the same load, we make sure they cannot have the paths reversed between them.
 constraint
     forall(i in 1..m-1, z in i+1..m where l[i] == l[z])(
-        lex_less([x[i,k] | k in 1..n+1] , [x[z,k1] | k1 in 1..n+1])
+        lex_less([x[i,k] | k in 1..n+1] , [x[z,k] | k in 1..n+1])
     );
 
 
