@@ -23,6 +23,7 @@ constraint
     traveled_max_dist = max(y);
 
 % Constraints
+%If the courier left an must return to the deposit, if it doesn't travel x[i,k] = k
 constraint
     forall(i in 1..m)(
         if x[i, n+1] != n+1 then count([x[i, j1] | j1 in 1..n], n+1, 1) 
@@ -48,10 +49,14 @@ constraint
 %if two couriers have the same load, we make sure they cannot have the paths reversed between them.
 constraint
     forall(i in 1..m-1, z in i+1..m where l[i] == l[z]) (
-        lex_lesseq([x[i, k] | k in 1..n], [x[z, k] | k in 1..n])
+        lex_less([x[i,k] | k in 1..n+1] , [x[z,k] | k in 1..n+1])
     );
 
-
+constraint
+    forall(i, j in 1..m where i < j /\ l[i] >= l[j]) (
+        (exists(k in 1..n) (x[i, k] != k) /\ exists(k in 1..n) (x[j, k] != k)) -> 
+        sum([s[k] | k in 1..n where x[i, k] != k]) >= sum([s[k] | k in 1..n where x[j, k] != k])
+    );
 
 constraint
     forall(i in 1..m)(
