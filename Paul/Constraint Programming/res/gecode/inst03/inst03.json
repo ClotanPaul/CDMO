@@ -18,17 +18,17 @@
     6
    ]
   ],
-  "runtime": "0:00:00.227000",
-  "initTime": "0:00:00.015530",
-  "solveTime": "0:00:00.009933",
+  "runtime": "0:00:00.276000",
+  "initTime": "0:00:00.013150",
+  "solveTime": "0:00:00.030942",
   "solutions": 2,
   "variables": 445,
   "propagators": 472,
-  "propagations": 63718,
-  "nodes": 349,
-  "failures": 165,
-  "restarts": 0,
-  "peakDepth": 16,
+  "propagations": 245000,
+  "nodes": 1204,
+  "failures": 577,
+  "restarts": 10,
+  "peakDepth": 21,
   "nSolutions": 2
  }
 }

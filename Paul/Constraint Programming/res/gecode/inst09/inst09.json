@@ -6,27 +6,25 @@
   "sol": [
    [],
    [],
-   [
-    7,
-    10,
-    12,
-    3,
-    9
-   ],
-   [
-    6,
-    5
-   ],
+   [],
+   [],
    [],
    [
+    4,
     11
    ],
    [
-    13,
-    2
+    3,
+    12,
+    7,
+    9,
+    6,
+    2,
+    10
    ],
    [
-    4
+    5,
+    13
    ],
    [
     8
@@ -35,17 +33,17 @@
     1
    ]
   ],
-  "runtime": "0:00:02.172000",
-  "initTime": "0:00:00.022425",
-  "solveTime": "0:04:59.736000",
-  "solutions": 32,
+  "runtime": "0:00:00.528000",
+  "initTime": "0:00:00.023732",
+  "solveTime": "0:04:59.713000",
+  "solutions": 3,
   "variables": 2450,
   "propagators": 2587,
-  "propagations": 1828636277,
-  "nodes": 8627168,
-  "failures": 4312157,
-  "restarts": 0,
-  "peakDepth": 206,
-  "nSolutions": 32
+  "propagations": 2308806316,
+  "nodes": 5841333,
+  "failures": 2871511,
+  "restarts": 9166,
+  "peakDepth": 141,
+  "nSolutions": 3
  }
 }

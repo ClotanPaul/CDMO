@@ -4,47 +4,47 @@
   "optimal": "False",
   "obj": 244,
   "sol": [
-   [],
-   [
-    11,
-    4,
-    13,
-    10
-   ],
-   [],
-   [],
-   [
-    7,
-    9,
-    6
-   ],
-   [
-    5,
-    3
-   ],
-   [
-    1,
-    8
-   ],
    [
     12
    ],
    [],
+   [],
+   [],
    [
-    2
+    6,
+    9,
+    7
+   ],
+   [
+    2,
+    8
+   ],
+   [
+    4,
+    13,
+    10
+   ],
+   [
+    5,
+    11
+   ],
+   [],
+   [
+    3,
+    1
    ]
   ],
-  "runtime": "0:00:05.031000",
-  "initTime": "0:00:00.023526",
-  "solveTime": "0:04:59.740000",
-  "solutions": 12,
+  "runtime": "0:00:00.640000",
+  "initTime": "0:00:00.021909",
+  "solveTime": "0:04:59.735000",
+  "solutions": 8,
   "variables": 2456,
   "propagators": 2606,
-  "propagations": 1882259861,
-  "nodes": 7040576,
-  "failures": 3519742,
-  "restarts": 0,
-  "peakDepth": 183,
-  "nSolutions": 12
+  "propagations": 2005265859,
+  "nodes": 5792298,
+  "failures": 2854648,
+  "restarts": 9089,
+  "peakDepth": 157,
+  "nSolutions": 8
  }
 }

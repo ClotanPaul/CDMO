@@ -39,7 +39,7 @@ def run_minizinc_on_all(dzn_files_dir, model_file, output_dir, timeout=300):
     """
     # Initialize MiniZinc model and configure solver
     model = minizinc.Model(model_file)
-    gecode = minizinc.Solver.lookup("gecode")
+    chuffed = minizinc.Solver.lookup("chuffed")
     
     # Find all .dzn files in the specified directory
     dzn_files = sorted([f for f in os.listdir(dzn_files_dir) if f.endswith('.dzn')])
@@ -51,7 +51,7 @@ def run_minizinc_on_all(dzn_files_dir, model_file, output_dir, timeout=300):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    instances_to_include = [12, 13, 16, 19] # list(range(1, 11)) + 
+    instances_to_include = list(range(1, 11)) + [13]
 
     for dzn_file in dzn_files:
         # Extract the instance number from the file name
@@ -63,7 +63,7 @@ def run_minizinc_on_all(dzn_files_dir, model_file, output_dir, timeout=300):
 
         full_path = os.path.join(dzn_files_dir, dzn_file)
         print(f"\nProcessing file: {full_path}")
-        instance = minizinc.Instance(gecode, model)
+        instance = minizinc.Instance(chuffed, model)
 
         # Load the .dzn data file into the instance
         instance.add_file(full_path)
@@ -88,6 +88,9 @@ def run_minizinc_on_all(dzn_files_dir, model_file, output_dir, timeout=300):
                 statistics = result.statistics
         
                 # Parse output to match required JSON structure
+                #print(result)
+
+                #break
                 assignment = result.solution.x
                 max_dist = result.solution.objective
 
@@ -104,7 +107,7 @@ def run_minizinc_on_all(dzn_files_dir, model_file, output_dir, timeout=300):
                         'runtime': str(statistics['time']),
                         'initTime': str(statistics['initTime']),
                         'solveTime': str(statistics['solveTime']),
-                        'solutions': statistics['solutions'],
+                        #'solutions': statistics['solutions'],
                         'variables': statistics['variables'],
                         'propagators': statistics['propagators'],
                         'propagations': statistics['propagations'],
@@ -174,7 +177,7 @@ def check_solutions_with_external_script(input_folder, results_folder):
 dzn_files_dir = 'dzn_files/'  # Modify this to the directory containing the .dzn files
 
 # Output directory for JSON files
-output_dir = 'res/gecode/'  # Modify this as needed
+output_dir = 'res/chuffed/'  # Modify this as needed
 
 # MiniZinc model file
 model_file = './model.mzn'  # Modify this to the path of your MiniZinc model file

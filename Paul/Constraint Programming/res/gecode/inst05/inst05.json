@@ -12,16 +12,16 @@
     3
    ]
   ],
-  "runtime": "0:00:00.191000",
-  "initTime": "0:00:00.009947",
-  "solveTime": "0:00:00.000278",
+  "runtime": "0:00:00.203000",
+  "initTime": "0:00:00.005517",
+  "solveTime": "0:00:00.000443",
   "solutions": 2,
   "variables": 167,
   "propagators": 32,
-  "propagations": 570,
-  "nodes": 7,
-  "failures": 2,
-  "restarts": 0,
+  "propagations": 619,
+  "nodes": 11,
+  "failures": 3,
+  "restarts": 3,
   "peakDepth": 2,
   "nSolutions": 2
  }
