@@ -34,15 +34,15 @@
     6
    ]
   ],
-  "runtime": "0:00:48.872000",
-  "initTime": "0:00:00.057795",
-  "solveTime": "0:04:59.802000",
+  "runtime": "0:00:55.146000",
+  "initTime": "0:00:00.066048",
+  "solveTime": "0:04:59.755000",
   "solutions": 48,
   "variables": 1852,
   "propagators": 1939,
-  "propagations": 1924224210,
-  "nodes": 10387353,
-  "failures": 5192107,
+  "propagations": 1604448194,
+  "nodes": 8798795,
+  "failures": 4397827,
   "restarts": 0,
   "peakDepth": 175,
   "nSolutions": 48

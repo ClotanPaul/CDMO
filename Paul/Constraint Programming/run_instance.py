@@ -51,12 +51,15 @@ def run_minizinc_on_all(dzn_files_dir, model_file, output_dir, timeout=300):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
+    instances_to_include = [12, 13, 16, 19] # list(range(1, 11)) + 
+
     for dzn_file in dzn_files:
-        # Stop if we reach instance 11
+        # Extract the instance number from the file name
         instance_number = int(''.join(filter(str.isdigit, dzn_file)))
-        #if instance_number > 10:
-        #    print("Reached instance 10. Stopping further processing.")
-        #    break
+        
+        # Check if the instance number is in the list of desired instances
+        if instance_number not in instances_to_include:
+            continue  # Skip files that are not in the specified instances
 
         full_path = os.path.join(dzn_files_dir, dzn_file)
         print(f"\nProcessing file: {full_path}")

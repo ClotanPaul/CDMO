@@ -1,6 +1,6 @@
 {
  "gecode": {
-  "time": 230,
+  "time": 290,
   "optimal": true,
   "obj": 220,
   "sol": [
@@ -29,9 +29,9 @@
     1
    ]
   ],
-  "runtime": "0:00:00.271000",
-  "initTime": "0:00:00.037402",
-  "solveTime": "0:03:49.829000",
+  "runtime": "0:00:00.359000",
+  "initTime": "0:00:00.047997",
+  "solveTime": "0:04:49.451000",
   "solutions": 13,
   "variables": 1577,
   "propagators": 1688,

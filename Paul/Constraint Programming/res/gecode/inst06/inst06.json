@@ -25,9 +25,9 @@
     4
    ]
   ],
-  "runtime": "0:00:00.247000",
-  "initTime": "0:00:00.051192",
-  "solveTime": "0:00:00.944693",
+  "runtime": "0:00:00.313000",
+  "initTime": "0:00:00.063411",
+  "solveTime": "0:00:01.226780",
   "solutions": 2,
   "variables": 989,
   "propagators": 1069,
