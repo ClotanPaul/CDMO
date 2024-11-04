@@ -7,37 +7,38 @@
    [],
    [],
    [],
-   [],
    [
-    10,
-    8,
-    9
-   ],
-   [
-    4,
-    7,
-    5
-   ],
-   [
+    9,
+    5,
     3,
-    6
+    6,
+    2
    ],
    [
-    1,
-    2
+    7,
+    4
+   ],
+   [
+    10
+   ],
+   [
+    1
+   ],
+   [
+    8
    ]
   ],
-  "runtime": "0:00:01.021000",
-  "initTime": "0:00:00.062025",
-  "solveTime": "0:04:59.742000",
+  "runtime": "0:00:00.302000",
+  "initTime": "0:00:00.048798",
+  "solveTime": "0:04:59.824000",
   "solutions": 18,
   "variables": 1577,
   "propagators": 1688,
-  "propagations": 2214252402,
-  "nodes": 10660945,
-  "failures": 5329967,
+  "propagations": 2300970839,
+  "nodes": 13860291,
+  "failures": 6929661,
   "restarts": 0,
-  "peakDepth": 137,
+  "peakDepth": 133,
   "nSolutions": 18
  }
 }
