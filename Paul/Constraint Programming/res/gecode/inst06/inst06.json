@@ -4,37 +4,38 @@
   "optimal": true,
   "obj": 322,
   "sol": [
-   [],
+   [
+    3,
+    6
+   ],
    [
     5,
+    7
+   ],
+   [
     2
    ],
    [
     8
    ],
    [
-    4,
-    3
-   ],
-   [
-    7,
-    6
-   ],
-   [
     1
+   ],
+   [
+    4
    ]
   ],
-  "runtime": "0:00:00.267000",
-  "initTime": "0:00:00.048704",
-  "solveTime": "0:00:00.979616",
-  "solutions": 4,
+  "runtime": "0:00:00.247000",
+  "initTime": "0:00:00.051192",
+  "solveTime": "0:00:00.944693",
+  "solutions": 2,
   "variables": 989,
   "propagators": 1069,
-  "propagations": 8202664,
-  "nodes": 45765,
-  "failures": 22825,
+  "propagations": 8734549,
+  "nodes": 40841,
+  "failures": 20393,
   "restarts": 0,
-  "peakDepth": 66,
-  "nSolutions": 4
+  "peakDepth": 64,
+  "nSolutions": 2
  }
 }

@@ -1,3 +1,4 @@
+% Use this editor as a MiniZinc scratch book
 include "globals.mzn";
 % Parameters
 int: m;                          % number of courriers
