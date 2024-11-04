@@ -12,6 +12,14 @@ def traverse_lists(lists):
         current_index = n  # Start from the last index (n)
         visited = []  # To memorize the traversal order
 
+        if not lst:  # If the list is empty, append an empty list
+            solution.append([])
+            continue
+        
+        if lst == list(range(1, len(lst) + 1)):
+            solution.append([])
+            continue
+
         # Traverse the list until the current index is equal to its value
         while lst[current_index - 1] != n:
             if current_index != n:
@@ -108,7 +116,7 @@ def run_minizinc_on_all(dzn_files_dir, model_file, output_dir, timeout=300):
                 print(f"The output data is: \n{output_data}")
                 
                 # Join the `sol` list into a string manually to avoid line breaks
-                output_data["gecode"]["sol"] = json.dumps(output_data["gecode"]["sol"]).replace('\n', '')
+                output_data["gecode"]["sol"] = json.loads(json.dumps(solution, separators=(',', ':')))
 
                 # Write the JSON output to a file in the designated subdirectory
                 with open(output_file_path, 'w') as output_file:
@@ -170,9 +178,9 @@ model_file = './model.mzn'  # Modify this to the path of your MiniZinc model fil
 
 # Run the MiniZinc model on all .dzn files
 # Uncomment the next line to run the instances and automatically save in separate folders
-run_minizinc_on_all(dzn_files_dir, model_file, output_dir, 300)
+#run_minizinc_on_all(dzn_files_dir, model_file, output_dir, 300)
 
 # Call the external solution checker script to validate the outputs
 # Pass the output directory directly (as JSON files are stored there)
-dat_files_dir = '../Instances/'
+dat_files_dir = '../Instances'
 check_solutions_with_external_script(dat_files_dir, output_dir)

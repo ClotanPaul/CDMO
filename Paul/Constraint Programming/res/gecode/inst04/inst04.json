@@ -3,16 +3,39 @@
   "time": 300,
   "optimal": "False",
   "obj": 220,
-  "sol": "[[11], [11], [11], [11], [10, 8, 9], [4, 7, 5], [3, 6], [1, 2]]",
-  "runtime": "0:00:01.127000",
-  "initTime": "0:00:00.059543",
-  "solveTime": "0:04:59.696000",
+  "sol": [
+   [],
+   [],
+   [],
+   [],
+   [
+    10,
+    8,
+    9
+   ],
+   [
+    4,
+    7,
+    5
+   ],
+   [
+    3,
+    6
+   ],
+   [
+    1,
+    2
+   ]
+  ],
+  "runtime": "0:00:01.021000",
+  "initTime": "0:00:00.062025",
+  "solveTime": "0:04:59.742000",
   "solutions": 18,
   "variables": 1577,
   "propagators": 1688,
-  "propagations": 2232209364,
-  "nodes": 10739034,
-  "failures": 5369011,
+  "propagations": 2214252402,
+  "nodes": 10660945,
+  "failures": 5329967,
   "restarts": 0,
   "peakDepth": 137,
   "nSolutions": 18
