@@ -1,39 +1,40 @@
 {
  "gecode": {
-  "time": 2,
+  "time": 1,
   "optimal": true,
   "obj": 322,
   "sol": [
    [],
-   [],
+   [
+    5,
+    2
+   ],
    [
     8
    ],
    [
-    3,
-    2,
-    1,
-    4
+    4,
+    3
    ],
    [
     7,
     6
    ],
    [
-    5
+    1
    ]
   ],
-  "runtime": "0:00:00.260000",
-  "initTime": "0:00:00.042317",
-  "solveTime": "0:00:01.602670",
-  "solutions": 7,
+  "runtime": "0:00:00.267000",
+  "initTime": "0:00:00.048704",
+  "solveTime": "0:00:00.979616",
+  "solutions": 4,
   "variables": 989,
   "propagators": 1069,
-  "propagations": 13445636,
-  "nodes": 92686,
-  "failures": 46241,
+  "propagations": 8202664,
+  "nodes": 45765,
+  "failures": 22825,
   "restarts": 0,
-  "peakDepth": 76,
-  "nSolutions": 7
+  "peakDepth": 66,
+  "nSolutions": 4
  }
 }

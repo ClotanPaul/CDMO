@@ -6,14 +6,14 @@
   "sol": [
    [],
    [
+    10,
     2,
     1,
     4,
     9,
     5,
     7,
-    6,
-    10
+    6
    ],
    [],
    [],
@@ -34,17 +34,17 @@
     12
    ]
   ],
-  "runtime": "0:00:00.303000",
-  "initTime": "0:00:00.020484",
-  "solveTime": "0:04:59.772000",
-  "solutions": 10,
+  "runtime": "0:00:00.274000",
+  "initTime": "0:00:00.018747",
+  "solveTime": "0:04:59.795000",
+  "solutions": 14,
   "variables": 2450,
   "propagators": 2587,
-  "propagations": 1672493624,
-  "nodes": 12733556,
-  "failures": 6366319,
+  "propagations": 1874827388,
+  "nodes": 11425537,
+  "failures": 5712121,
   "restarts": 0,
-  "peakDepth": 217,
-  "nSolutions": 10
+  "peakDepth": 216,
+  "nSolutions": 14
  }
 }

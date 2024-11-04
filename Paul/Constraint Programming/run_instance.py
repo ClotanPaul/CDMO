@@ -178,7 +178,7 @@ model_file = './model.mzn'  # Modify this to the path of your MiniZinc model fil
 
 # Run the MiniZinc model on all .dzn files
 # Uncomment the next line to run the instances and automatically save in separate folders
-run_minizinc_on_all(dzn_files_dir, model_file, output_dir, 300)
+#run_minizinc_on_all(dzn_files_dir, model_file, output_dir, 300)
 
 # Call the external solution checker script to validate the outputs
 # Pass the output directory directly (as JSON files are stored there)

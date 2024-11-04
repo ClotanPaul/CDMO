@@ -6,47 +6,46 @@
   "sol": [
    [
     5,
-    2,
     1,
-    4,
+    11,
     10
    ],
    [],
    [],
    [
-    9
+    3,
+    9,
+    6
    ],
    [
     12
    ],
    [
-    13,
-    11
+    7
    ],
    [
     8
    ],
    [
-    3
+    2
    ],
+   [],
    [
-    7
-   ],
-   [
-    6
+    13,
+    4
    ]
   ],
-  "runtime": "0:00:00.419000",
-  "initTime": "0:00:00.019009",
-  "solveTime": "0:04:59.784000",
-  "solutions": 22,
+  "runtime": "0:00:01.556000",
+  "initTime": "0:00:00.020062",
+  "solveTime": "0:04:59.763000",
+  "solutions": 15,
   "variables": 2456,
   "propagators": 2606,
-  "propagations": 1461141750,
-  "nodes": 9419966,
-  "failures": 4709017,
+  "propagations": 2141694648,
+  "nodes": 8746003,
+  "failures": 4372297,
   "restarts": 0,
-  "peakDepth": 204,
-  "nSolutions": 22
+  "peakDepth": 205,
+  "nSolutions": 15
  }
 }

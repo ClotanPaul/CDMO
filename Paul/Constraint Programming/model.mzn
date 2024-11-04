@@ -64,7 +64,8 @@ constraint
     );
 % Solve the model
 %solve :: int_search(x, first_fail, indomain_min) minimize traveled_max_dist; %original search
-solve :: int_search(x, occurrence, indomain_min) minimize traveled_max_dist; % optimize the variables with highest number of constrants first
+%solve :: int_search(x, occurrence, indomain_min) minimize traveled_max_dist; % optimize the variables with highest number of constraints first
+solve :: int_search(x, dom_w_deg, indomain_min) minimize traveled_max_dist; % optimize the variables with highest number of constraints first
 
 
 output [
