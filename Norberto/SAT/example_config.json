@@ -1,0 +1,7 @@
+[   
+    {
+    "instance": "./Instances/inst01.dat",
+    "method": "sat",
+    "timeout": 300
+    }
+]
