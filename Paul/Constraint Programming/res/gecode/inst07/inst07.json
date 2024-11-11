@@ -1,7 +1,7 @@
 {
  "gecode": {
-  "time": 300,
-  "optimal": "False",
+  "time": 15,
+  "optimal": true,
   "obj": 167,
   "sol": [
    [
@@ -34,15 +34,15 @@
     2
    ]
   ],
-  "runtime": "0:00:16.842000",
-  "initTime": "0:00:00.036789",
-  "solveTime": "0:04:59.769000",
+  "runtime": "0:00:15.503000",
+  "initTime": "0:00:00.059263",
+  "solveTime": "0:00:15.220000",
   "variables": 1846,
   "propagators": 1930,
-  "propagations": 1638087265,
-  "nodes": 6754676,
-  "failures": 3323464,
-  "restarts": 10696,
+  "propagations": 128554898,
+  "nodes": 396446,
+  "failures": 192624,
+  "restarts": 916,
   "peakDepth": 194,
   "nSolutions": 24
  }
