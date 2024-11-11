@@ -59,6 +59,11 @@ constraint
     );
 
 constraint
+    forall(i in 1..m-1)(
+        l[i] <= l[i+1]
+    );
+
+constraint
     forall(i in 1..m)(
         subcircuit([x[i, j] | j in 1..n+1])  % Use the subcircuit global constraint for each courier's route
     );

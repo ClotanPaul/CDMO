@@ -12,8 +12,8 @@
     3
    ]
   ],
-  "runtime": "0:00:00.014000",
-  "initTime": "0:00:00.014000",
+  "runtime": "0:00:00.023000",
+  "initTime": "0:00:00.023000",
   "solveTime": "0:00:00",
   "variables": 4352,
   "propagators": 150,

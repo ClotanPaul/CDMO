@@ -34,16 +34,16 @@
     3
    ]
   ],
-  "runtime": "0:04:59.881000",
-  "initTime": "0:00:00.113000",
-  "solveTime": "0:04:59.768000",
-  "variables": 51851,
-  "propagators": 1860,
-  "propagations": 611500376,
-  "nodes": 1178028,
-  "failures": 878984,
-  "restarts": 7972,
-  "peakDepth": 176,
-  "nSolutions": 83
+  "runtime": "0:04:59.887000",
+  "initTime": "0:00:00.120000",
+  "solveTime": "0:04:59.767000",
+  "variables": 52218,
+  "propagators": 1851,
+  "propagations": 570296722,
+  "nodes": 933191,
+  "failures": 835630,
+  "restarts": 74,
+  "peakDepth": 115,
+  "nSolutions": 74
  }
 }

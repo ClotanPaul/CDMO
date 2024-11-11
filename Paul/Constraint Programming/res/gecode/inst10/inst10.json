@@ -7,13 +7,15 @@
    [
     12
    ],
-   [],
-   [],
-   [],
    [
-    6,
-    9,
-    7
+    9
+   ],
+   [
+    10,
+    5
+   ],
+   [
+    13
    ],
    [
     2,
@@ -21,30 +23,31 @@
    ],
    [
     4,
-    13,
-    10
+    7
    ],
    [
-    5,
+    1
+   ],
+   [
     11
    ],
-   [],
    [
-    3,
-    1
+    6
+   ],
+   [
+    3
    ]
   ],
-  "runtime": "0:00:00.640000",
-  "initTime": "0:00:00.021909",
-  "solveTime": "0:04:59.735000",
-  "solutions": 8,
-  "variables": 2456,
-  "propagators": 2606,
-  "propagations": 2005265859,
-  "nodes": 5792298,
-  "failures": 2854648,
-  "restarts": 9089,
-  "peakDepth": 157,
-  "nSolutions": 8
+  "runtime": "0:00:05.764000",
+  "initTime": "0:00:00.017894",
+  "solveTime": "0:04:59.796000",
+  "variables": 2431,
+  "propagators": 2556,
+  "propagations": 2066560123,
+  "nodes": 5664533,
+  "failures": 2794262,
+  "restarts": 8723,
+  "peakDepth": 175,
+  "nSolutions": 1
  }
 }

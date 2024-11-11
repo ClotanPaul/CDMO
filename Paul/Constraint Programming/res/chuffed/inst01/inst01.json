@@ -15,15 +15,15 @@
     6
    ]
   ],
-  "runtime": "0:00:00.038000",
-  "initTime": "0:00:00.034000",
+  "runtime": "0:00:00.025000",
+  "initTime": "0:00:00.021000",
   "solveTime": "0:00:00.004000",
-  "variables": 2327,
-  "propagators": 236,
-  "propagations": 23816,
-  "nodes": 167,
+  "variables": 2326,
+  "propagators": 235,
+  "propagations": 22624,
+  "nodes": 159,
   "failures": 114,
-  "restarts": 8,
+  "restarts": 4,
   "peakDepth": 11,
   "nSolutions": 4
  }
