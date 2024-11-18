@@ -35,24 +35,30 @@ def get_list_of_values(ll,j):
     return([If(x==j,1,0) for l in ll for x in l])
 
 
+def maxdist_calc(distances, pk_bound):
+    vertical_distance = np.sum(np.max(distances, axis=1))
+    sorted_distance = np.sum(sorted(distances.flatten(), reverse=True)[:pk_bound+1])
+    max_dist = np.min([vertical_distance, sorted_distance])
+
+    return max_dist
+
+
+
 def stm_model(instance, timeout, sb):
     m = instance["m"] # couriers
     n = instance["n"] # packages
     l = instance["l"] # weigths
     s = instance["s"] # sizes of couriers
     D = instance["D"] # distances
-    time = n
+    pk_bound = n + 1
 
     distances = np.array(instance["D"])
 
-    max_dist_bound1 = np.sum(np.max(distances, axis=1))
-    max_dist_bound2 = np.sum(sorted(distances.flatten(), reverse=True)[:time+1])
 
-    max_dist = np.min([max_dist_bound1, max_dist_bound2])
-
-    min_load = 0
-    max_load = min(np.max(l), np.sum(sorted(s, reverse=True)[:time]))
-    min_solution = 0
+    min_load = np.min(s)
+    max_load = min(np.max(l), np.sum(sorted(s, reverse=True)[:pk_bound]))
+    max_dist = maxdist_calc(distances, pk_bound)
+    min_solution = np.max([distances[n, j] + distances[j, n] for j in range(n)])
 
     # casting integers to z3 integers
     max_load = IntVal(f"{max_load}")
@@ -62,8 +68,8 @@ def stm_model(instance, timeout, sb):
 
     o = Optimize()
 
-    # main decision variable: x[i,k] = j mean that the i-th courier is in j at time k
-    x = [[Int(f'x_{i}_{k}') for k in range(0,time+1)]for i in range(m)]
+    # main decision variable: x[i,k] = j mean that the i-th courier is in j at pk_bound k
+    x = [[Int(f'x_{i}_{k}') for k in range(0,pk_bound+1)]for i in range(m)]
 
     # variable for distance calculation
     y = [Int(f'y_{i}') for i in range(m)] 
@@ -92,16 +98,16 @@ def stm_model(instance, timeout, sb):
     ####################################### CONSTRAINTS #######################################
 
     # define possible value for x[i][k]
-    o.add([And(x[i][k] >= 0, x[i][k] <= n) for i in range(m) for k in range(1,time)])
-    o.add([And(x[i][0] == n, x[i][time] == n) for i in range(m)])
+    o.add([And(x[i][k] >= 0, x[i][k] <= n) for i in range(m) for k in range(1,pk_bound)])
+    o.add([And(x[i][0] == n, x[i][pk_bound] == n) for i in range(m)])
 
     # for each i foreach k, each x[i][k] must be different, unless it is equal to n
     for j in range(n):
-        o.add([Sum(get_list_of_values([[x[i][k] for k in range(1,time+1)] for i in range(m)],j))==1])
+        o.add([Sum(get_list_of_values([[x[i][k] for k in range(1,pk_bound+1)] for i in range(m)],j))==1])
     
     # for each i, the sum of the weights of the packages carried by the courier i must be less than the capacity of the courier i
     for i in range(m):
-        o.add(load[i] == Sum([s[x[i][k]] for k in range(1,time)]))
+        o.add(load[i] == Sum([s[x[i][k]] for k in range(1,pk_bound)]))
         o.add(load[i] <= l[i])
     
     # bound to loads array
@@ -112,7 +118,7 @@ def stm_model(instance, timeout, sb):
     if sb:
         # once a courier i return to the depot, it cant deliver other packages
         for i in range(m):
-            for k in range(1,time):
+            for k in range(1,pk_bound):
                 o.add(Implies(x[i][k]==n, x[i][k+1]==n))
         
         # lexycographic constraint between couriers with == capacity
@@ -129,7 +135,7 @@ def stm_model(instance, timeout, sb):
     
     # distances array
     for i in range(m):
-        o.add(y[i] == Sum([distances[x[i][k]][x[i][k+1]] for k in range(0,time)]))
+        o.add(y[i] == Sum([distances[x[i][k]][x[i][k+1]] for k in range(0,pk_bound)]))
 
     #bound to distances array
     for i in range(m):
@@ -149,11 +155,11 @@ def format_solution(instance, model, x):
     m = instance['m'] # couriers
     n = instance['n'] # packages
     print(model)
-    time = n # max number of packages a courier can carry
+    pk_bound = n # max number of packages a courier can carry
     step_courier = []
     for i in range(m):
         step_courier.append([])
-        for k in range(1,time+1):
+        for k in range(1,pk_bound+1):
             if model.eval(x[i][k]).as_long() != n:
                 step_courier[i].append(model.eval(x[i][k]).as_long() + 1) 
     return step_courier
