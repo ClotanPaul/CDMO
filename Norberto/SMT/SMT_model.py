@@ -2,10 +2,6 @@ from z3 import *
 import re
 import numpy as np
 
-from utils import *
-
-time = 4
-
 def data_parsing(data):
     text = data.split("\n")
     num_reg = r"(\d+)"
@@ -39,18 +35,6 @@ def get_list_of_values(ll,j):
     return([If(x==j,1,0) for l in ll for x in l])
 
 
-
-def maxv(vs):
-  m = vs[0]
-  for x in vs[1:]:
-    m = If(x > m, x, m)
-  return m
-
-def get_list_of_values(ll,j):
-        return([If(x==j,1,0) for l in ll for x in l])
-
-
-
 def stm_model(instance, timeout, sb):
     m = instance["m"] # couriers
     n = instance["n"] # packages
@@ -66,7 +50,6 @@ def stm_model(instance, timeout, sb):
 
     max_dist = np.min([max_dist_bound1, max_dist_bound2])
 
-    min_dist = 0
     min_load = 0
     max_load = min(np.max(l), np.sum(sorted(s, reverse=True)[:time]))
     min_solution = 0
@@ -74,7 +57,6 @@ def stm_model(instance, timeout, sb):
     # casting integers to z3 integers
     max_load = IntVal(f"{max_load}")
     min_load = IntVal(f"{min_load}")
-    min_dist = IntVal(f"{min_dist}")
     max_dist = IntVal(f"{max_dist}")
     min_solution = IntVal(f"{min_solution}")
 
@@ -151,7 +133,7 @@ def stm_model(instance, timeout, sb):
 
     #bound to distances array
     for i in range(m):
-        o.add(And(y[i] >= min_dist, y[i] <= max_dist))
+        o.add(y[i] <= max_dist)
 
     # variable to minimize
     o.add(max_distance == maxv(y))
@@ -166,7 +148,7 @@ def stm_model(instance, timeout, sb):
 def format_solution(instance, model, x):
     m = instance['m'] # couriers
     n = instance['n'] # packages
-    # print(model)
+    print(model)
     time = n # max number of packages a courier can carry
     step_courier = []
     for i in range(m):
