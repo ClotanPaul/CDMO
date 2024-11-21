@@ -51,7 +51,7 @@ def run_minizinc_on_all(dzn_files_dir, model_file, output_dir, timeout=300):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    instances_to_include = list(range(1, 22)) 
+    instances_to_include = list(range(11, 22)) 
 
     for dzn_file in dzn_files:
         # Extract the instance number from the file name
@@ -177,7 +177,7 @@ def check_solutions_with_external_script(input_folder, results_folder):
 dzn_files_dir = 'dzn_files/'  # Modify this to the directory containing the .dzn files
 
 # Output directory for JSON files
-output_dir = 'res/gecode/'  # Modify this as needed
+output_dir = 'res/gecode_test/'  # Modify this as needed
 
 # MiniZinc model file
 model_file = './model.mzn'  # Modify this to the path of your MiniZinc model file
