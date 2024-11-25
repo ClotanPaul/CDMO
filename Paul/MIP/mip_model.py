@@ -1,5 +1,9 @@
 from ortools.linear_solver import pywraplp
 import numpy as np
+import os 
+import json
+import time
+
 
 def read_dat_file(file_path):
     """Parse the .dat file to extract instance data."""
@@ -32,7 +36,7 @@ def read_dat_file(file_path):
     
     return m, n, capacities, sizes, np.array(distance_matrix)
 
-def solve_mcp(file_path):
+def solve_mcp(file_path, timeout = 300):
     # Read instance data from the .dat file
     m, n, capacities, sizes, D = read_dat_file(file_path)
     
@@ -121,39 +125,66 @@ def solve_mcp(file_path):
         solver.Add(z >= y[k])
 
     # Solve the problem
+    start_time = time.time()
     status = solver.Solve()
+    end_time = time.time()
+    runtime = end_time - start_time
 
-    # Check if any solution was found
     if status in (pywraplp.Solver.OPTIMAL, pywraplp.Solver.FEASIBLE):
-        print(f"Solution found with maximum distance: {solver.Objective().Value()}")
-
-        # Print the solution for each courier
+        # Extract solution
+        max_dist = solver.Objective().Value()
+        solution = []
         for k in range(m):
-            items = set()
             route = []
             for i in range(num_nodes):
                 for j in range(num_nodes):
                     if x[i, j, k].solution_value() > 0.5:
                         route.append((i, j))
-                        if j != n:
-                            items.add(j)  # Items correspond to customer nodes
-            print(f"Courier {k + 1}: delivers items {sorted(items)} with distance {y[k].solution_value()}")
-            print(f"  Route: {route}")
+            solution.append(route)
+        print(solution)
 
-        # Check if the solution is optimal
-        if status == pywraplp.Solver.OPTIMAL:
-            print("The solution is optimal.")
-        else:
-            print("The solution is not optimal, but it is the best found within the time limit.")
+        return {
+            "time": int(runtime) if runtime < timeout else timeout,
+            "optimal": status == pywraplp.Solver.OPTIMAL,
+            "obj": max_dist,
+            "sol": solution
+        }
     else:
-        print("No feasible solution found.")
+        return {
+            "time": timeout,
+            "optimal": False,
+            "obj": None,
+            "sol": "NO SOLUTION FOUND"
+        }
 
+def run_batch_instances(instance_dir, output_dir, timeout=300):
+    """Runs the solver on all instances in a directory and saves results in JSON format."""
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
 
+    instance_files = sorted([f for f in os.listdir(instance_dir) if f.endswith('.dat')])
+
+    for instance_file in instance_files:
+        instance_path = os.path.join(instance_dir, instance_file)
+        print(f"Processing {instance_path}...")
+
+        try:
+            result = solve_mcp(instance_path)
+
+            # Save result to JSON file
+            instance_name = os.path.splitext(instance_file)[0]
+            output_file = os.path.join(output_dir, f"{instance_name}.json")
+            with open(output_file, 'w') as f:
+                json.dump(result, f, indent=4)
+
+            print(f"Result saved to {output_file}")
+        except Exception as e:
+            print(f"Error processing {instance_path}: {e}")
 
 if __name__ == "__main__":
-    # Batch processing for instances 01-10 and 13
-    for instance_id in list(range(1, 11)) + [13]:
-        instance_file = f'Instances/inst{instance_id:02}.dat'  # Format filenames like inst01.dat
-        print(f"Processing {instance_file}...")
-        solve_mcp(instance_file)
-        print("\n" + "="*50 + "\n")
+    # Define instance directory and output directory
+    instance_dir = "Instances"  # Directory containing .dat files
+    output_dir = "Results"      # Directory to store JSON results
+
+    # Run the solver for all instances
+    run_batch_instances(instance_dir, output_dir, timeout=300)
