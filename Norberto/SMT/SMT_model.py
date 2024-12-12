@@ -60,6 +60,8 @@ def stm_model(instance, timeout, sb):
     max_dist = maxdist_calc(distances, pk_bound)
     min_solution = np.max([distances[n, j] + distances[j, n] for j in range(n)])
 
+    min_distance = min(min(distances[n][:n]), min([x[n] for x in distances[:n]]))*2
+
     # casting integers to z3 integers
     max_load = IntVal(f"{max_load}")
     min_load = IntVal(f"{min_load}")
@@ -101,7 +103,7 @@ def stm_model(instance, timeout, sb):
     o.add([And(x[i][k] >= 0, x[i][k] <= n) for i in range(m) for k in range(1,pk_bound)])
     o.add([And(x[i][0] == n, x[i][pk_bound] == n) for i in range(m)])
 
-    # for each i foreach k, each x[i][k] must be different, unless it is equal to n
+    # for each i foreach k, each x[i][k] must be different, unless it is equal to n.
     for j in range(n):
         o.add([Sum(get_list_of_values([[x[i][k] for k in range(1,pk_bound+1)] for i in range(m)],j))==1])
     
@@ -113,6 +115,12 @@ def stm_model(instance, timeout, sb):
     # bound to loads array
     for i in range(m):
         o.add(And(load[i] >= min_load, load[i] <= max_load))
+
+    # Total items size less than total couriers capacity
+    o.add(Sum([load[i] for i in range(m)]) >= Sum([s[j] for j in range(n)]))
+
+
+
 
     ####################################### SYMMETRY BREAKING CONSTRAINTS #######################################
     if sb:
@@ -130,6 +138,7 @@ def stm_model(instance, timeout, sb):
         for i1 in range(m-1):
             for i2 in range(i1+1,m):
                 o.add(Implies(l[i1] <= l[i2], load[i1] <= load[i2]))
+    
 
     ####################################### OBJECTIVE FUNCTION #######################################
     
@@ -139,7 +148,7 @@ def stm_model(instance, timeout, sb):
 
     #bound to distances array
     for i in range(m):
-        o.add(y[i] <= max_dist)
+        o.add(And(y[i] >= IntVal(f"{min_distance}"), y[i] <= max_dist))
 
     # variable to minimize
     o.add(max_distance == maxv(y))
@@ -155,7 +164,7 @@ def format_solution(instance, model, x):
     m = instance['m'] # couriers
     n = instance['n'] # packages
     print(model)
-    pk_bound = n # max number of packages a courier can carry
+    pk_bound = n-1 # max number of packages a courier can carry
     step_courier = []
     for i in range(m):
         step_courier.append([])
