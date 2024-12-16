@@ -50,8 +50,8 @@ def run_minizinc_on_all(dzn_files_dir, model_file, output_dir, timeout=300):
     # Ensure the output directory exists
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-
-    instances_to_include = list(range(11, 22)) 
+    #list(range(1, 11))+ 
+    instances_to_include = list(range(11, 22))#+[13,16]
 
     for dzn_file in dzn_files:
         # Extract the instance number from the file name

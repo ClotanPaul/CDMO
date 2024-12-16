@@ -5,9 +5,9 @@
   "obj": 14,
   "sol": [
    [
-    4,
+    1,
     3,
-    1
+    4
    ],
    [
     2,
@@ -15,16 +15,16 @@
     6
    ]
   ],
-  "runtime": "0:00:00.178000",
-  "initTime": "0:00:00.009860",
-  "solveTime": "0:00:00.004527",
+  "runtime": "0:00:00.213000",
+  "initTime": "0:00:00.010840",
+  "solveTime": "0:00:00.005327",
   "variables": 263,
   "propagators": 286,
-  "propagations": 50126,
-  "nodes": 356,
-  "failures": 162,
+  "propagations": 48018,
+  "nodes": 272,
+  "failures": 121,
   "restarts": 5,
-  "peakDepth": 11,
+  "peakDepth": 12,
   "nSolutions": 3
  }
 }

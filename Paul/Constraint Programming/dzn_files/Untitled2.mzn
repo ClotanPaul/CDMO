@@ -1,5 +1,5 @@
 include "globals.mzn";
-%include "gecode.mzn";
+include "gecode.mzn";
 % Parameters
 int: m;                          % number of couriers
 int: n;                          % number of distribution points
@@ -9,7 +9,6 @@ array[1..n+1, 1..n+1] of int: D; % distance matrix (n+1 corresponds to the origi
 
 % Decision variables
 array[1..m, 1..n+1] of var 1..n+1: x; % x[i, j1] = j2 if courier i goes from j1 to j2, j1 otherwise
-array[1..n] of var 1..m: bins;        % bins[j] indicates which courier handles item j
 
 int: sum_of_row_max = sum([ max([D[i, j] | j in 1..n+1]) | i in 1..n+1 ]);
 
@@ -39,29 +38,21 @@ constraint
         if x[i, n+1] != n+1 then count([x[i, j1] | j1 in 1..n], n+1, 1) 
         else forall(k in 1..n) (x[i, k] = k) endif
     );
-% Link bins to x
-constraint forall(j in 1..n)(
-    exists(i in 1..m)(x[i, j] != j /\ bins[j] = i)
-);
-% Bin Packing Constraint for Load Capacity
-constraint bin_packing_capa(l, bins, s);
 
 constraint
     forall(i, j in 1..m where i < j /\ l[i] >= l[j]) (
         sum([s[k] | k in 1..n where x[i, k] != k]) >= sum([s[k] | k in 1..n where x[j, k] != k])
     );
 
-%this is redundant with bin packing k
-%constraint
-%    forall(i in 1..m)(
-%        sum([s[j1] | j1 in 1..n where x[i, j1] != j1]) <= l[i]   % Capacity constraint
-%    );
-   
-%Exactly one courier per package
-constraint forall(j in 1..n) (
-    count([x[i, j] != j | i in 1..m], true) == 1
-);
+constraint
+    forall(i in 1..m)(
+        sum([s[j1] | j1 in 1..n where x[i, j1] != j1]) <= l[i]   % Capacity constraint
+    );
 
+constraint
+    forall(j in 1..n) (
+        sum([x[i, j] != j | i in 1..m]) == 1  % Exactly one courier per package
+    );
 
 % If two couriers have the same load, we ensure their routes are lexicographically ordered to break symmetry.
 constraint
@@ -79,27 +70,12 @@ constraint
     forall(i in 1..m)(
         subcircuit([x[i, j] | j in 1..n+1])  % Ensure each courier's route forms a valid subcircuit
     );
-%added. optional. might remove ----------------
-%constraint forall(i, j in 1..m where i < j)(
-%    sum([s[k] | k in 1..n where x[i, k] != k]) >= sum([s[k] | k in 1..n where x[j, k] != k])
-%);
 
-%constraint forall(i in 1..m)(
-%    if l[m] >= sum(s) then x[i, n+1] != n+1 endif
-%);
-
-%added. optional. might remove ----------------
-%constraint forall(i, j in 1..m where i < j)(
-%    sum([s[k] | k in 1..n where x[i, k] != k]) >= sum([s[k] | k in 1..n where x[j, k] != k])
-%);
-
-%constraint forall(i in 1..m)(
-%    if l[m] >= sum(s) then x[i, n+1] != n+1 endif
-%);
+% Solve the model using the Luby restart strategy with the specified number of restarts
 % Solve the model using the Luby restart strategy with the specified number of restarts
 solve
-:: restart_geometric(2,50) 
-:: relax_and_reconstruct([x[i, j] | i in 1..m, j in 1..n+1], 50) % Relax 50% of the routes
+:: restart_luby(50) 
+%:: relax_and_reconstruct([x[i, j] | i in 1..m, j in 1..n+1], 50) % Relax 50% of the routes
 %:: int_search(x, occurance, indomain_median)   % Relax 50% of the decision variables
 :: int_search(x, dom_w_deg, indomain_median)   % Relax 50% of the decision variables
 minimize traveled_max_dist;

@@ -179,7 +179,7 @@ def solve_mcp(file_path):
 
 
 
-instance_file = 'd:/personal/uni/cdo/project/Instances/inst13.dat'  # Format filenames like inst01.dat
+instance_file = 'a/Instances/inst13.dat'  # Format filenames like inst01.dat
 print(f"Processing {instance_file}...")
 solve_mcp(instance_file)
 print("\n" + "="*50 + "\n")

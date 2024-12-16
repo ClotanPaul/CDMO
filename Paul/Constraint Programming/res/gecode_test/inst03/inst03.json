@@ -6,28 +6,28 @@
   "sol": [
    [
     5,
-    6,
-    3
-   ],
-   [
     4,
     2
    ],
    [
     7,
-    1
+    3
+   ],
+   [
+    1,
+    6
    ]
   ],
-  "runtime": "0:00:00.207000",
-  "initTime": "0:00:00.015140",
-  "solveTime": "0:00:00.030300",
+  "runtime": "0:00:00.279000",
+  "initTime": "0:00:00.034021",
+  "solveTime": "0:00:00.021532",
   "variables": 442,
   "propagators": 466,
-  "propagations": 330185,
-  "nodes": 1991,
-  "failures": 958,
-  "restarts": 10,
-  "peakDepth": 19,
-  "nSolutions": 3
+  "propagations": 129010,
+  "nodes": 749,
+  "failures": 355,
+  "restarts": 6,
+  "peakDepth": 23,
+  "nSolutions": 2
  }
 }
