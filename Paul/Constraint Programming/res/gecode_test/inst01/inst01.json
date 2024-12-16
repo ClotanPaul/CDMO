@@ -15,16 +15,16 @@
     6
    ]
   ],
-  "runtime": "0:00:00.213000",
-  "initTime": "0:00:00.010840",
-  "solveTime": "0:00:00.005327",
-  "variables": 263,
-  "propagators": 286,
-  "propagations": 48018,
-  "nodes": 272,
-  "failures": 121,
-  "restarts": 5,
-  "peakDepth": 12,
+  "runtime": "0:00:00.220000",
+  "initTime": "0:00:00.009637",
+  "solveTime": "0:00:00.018519",
+  "variables": 296,
+  "propagators": 317,
+  "propagations": 144089,
+  "nodes": 952,
+  "failures": 419,
+  "restarts": 19,
+  "peakDepth": 17,
   "nSolutions": 3
  }
 }

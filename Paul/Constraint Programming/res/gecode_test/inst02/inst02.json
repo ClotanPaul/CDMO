@@ -4,38 +4,36 @@
   "optimal": true,
   "obj": 226,
   "sol": [
+   [],
+   [],
    [
-    8,
+    9,
     6,
-    9
+    8
    ],
    [
-    5,
-    7
+    4,
+    1
    ],
    [
-    3
-   ],
-   [
-    4
-   ],
-   [
+    3,
+    7,
     2
    ],
    [
-    1
+    5
    ]
   ],
-  "runtime": "0:00:00.367000",
-  "initTime": "0:00:00.039236",
-  "solveTime": "0:00:00.070031",
-  "variables": 775,
-  "propagators": 896,
-  "propagations": 451707,
-  "nodes": 1719,
-  "failures": 769,
-  "restarts": 8,
-  "peakDepth": 67,
-  "nSolutions": 3
+  "runtime": "0:00:00.475000",
+  "initTime": "0:00:00.042368",
+  "solveTime": "0:00:00.174500",
+  "variables": 1207,
+  "propagators": 1275,
+  "propagations": 917542,
+  "nodes": 6052,
+  "failures": 1693,
+  "restarts": 50,
+  "peakDepth": 166,
+  "nSolutions": 19
  }
 }

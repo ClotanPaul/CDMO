@@ -5,28 +5,28 @@
   "obj": 12,
   "sol": [
    [
-    5,
+    3,
+    6,
+    5
+   ],
+   [
     4,
     2
    ],
    [
     7,
-    3
-   ],
-   [
-    1,
-    6
+    1
    ]
   ],
-  "runtime": "0:00:00.279000",
-  "initTime": "0:00:00.034021",
-  "solveTime": "0:00:00.021532",
-  "variables": 442,
-  "propagators": 466,
-  "propagations": 129010,
-  "nodes": 749,
-  "failures": 355,
-  "restarts": 6,
+  "runtime": "0:00:00.228000",
+  "initTime": "0:00:00.018495",
+  "solveTime": "0:00:00.004225",
+  "variables": 497,
+  "propagators": 525,
+  "propagations": 30962,
+  "nodes": 136,
+  "failures": 38,
+  "restarts": 5,
   "peakDepth": 23,
   "nSolutions": 2
  }

@@ -17,9 +17,14 @@ array[1..m] of var 0..sum_of_row_max: y; % y[i] is the total distance travelled 
 
 
 % Lower and Upper Bounds for traveled_max_dist
-int: obj_lowerbound = max(i in 1..n)(D[n+1, i] + D[i, n+1]);  % minimum round-trip distance to any point
-array[1..n] of int: max_dists = [max(j in 1..n)(D[i, j]) | i in 1..n];
-int: obj_upperbound = sum(i in 1..n)(max_dists[i]) + max(i in 1..n)(D[n+1, i]) + max(i in 1..n)(D[i, n+1]);
+% Dynamically calculated bounds
+int: obj_lowerbound = max(
+    max(i in 1..n)(D[n+1, i] + D[i, n+1]),
+    max(i in 1..n, j in 1..n where i != j)(D[i, j])
+);
+int: obj_upperbound = sum(i in 1..n)(
+    max(j in 1..n+1)(D[i, j])
+) + max(i in 1..n)(D[n+1, i] + D[i, n+1]);
 
 % Objective variable with bounds
 var obj_lowerbound..obj_upperbound: traveled_max_dist;
@@ -46,16 +51,6 @@ constraint forall(j in 1..n)(
 % Bin Packing Constraint for Load Capacity
 constraint bin_packing_capa(l, bins, s);
 
-constraint
-    forall(i, j in 1..m where i < j /\ l[i] >= l[j]) (
-        sum([s[k] | k in 1..n where x[i, k] != k]) >= sum([s[k] | k in 1..n where x[j, k] != k])
-    );
-
-%this is redundant with bin packing k
-%constraint
-%    forall(i in 1..m)(
-%        sum([s[j1] | j1 in 1..n where x[i, j1] != j1]) <= l[i]   % Capacity constraint
-%    );
    
 %Exactly one courier per package
 constraint forall(j in 1..n) (
@@ -79,29 +74,13 @@ constraint
     forall(i in 1..m)(
         subcircuit([x[i, j] | j in 1..n+1])  % Ensure each courier's route forms a valid subcircuit
     );
-%added. optional. might remove ----------------
-%constraint forall(i, j in 1..m where i < j)(
-%    sum([s[k] | k in 1..n where x[i, k] != k]) >= sum([s[k] | k in 1..n where x[j, k] != k])
-%);
 
-%constraint forall(i in 1..m)(
-%    if l[m] >= sum(s) then x[i, n+1] != n+1 endif
-%);
-
-%added. optional. might remove ----------------
-%constraint forall(i, j in 1..m where i < j)(
-%    sum([s[k] | k in 1..n where x[i, k] != k]) >= sum([s[k] | k in 1..n where x[j, k] != k])
-%);
-
-%constraint forall(i in 1..m)(
-%    if l[m] >= sum(s) then x[i, n+1] != n+1 endif
-%);
-% Solve the model using the Luby restart strategy with the specified number of restarts
 solve
-:: restart_geometric(2,50) 
+:: restart_luby(2*n) 
 :: relax_and_reconstruct([x[i, j] | i in 1..m, j in 1..n+1], 50) % Relax 50% of the routes
 %:: int_search(x, occurance, indomain_median)   % Relax 50% of the decision variables
-:: int_search(x, dom_w_deg, indomain_median)   % Relax 50% of the decision variables
+:: int_search(x, dom_w_deg, indomain_split)   % Relax 50% of the decision variables
+%satisfy;
 minimize traveled_max_dist;
 
 output [

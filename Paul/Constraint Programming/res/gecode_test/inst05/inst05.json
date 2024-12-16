@@ -12,12 +12,12 @@
     3
    ]
   ],
-  "runtime": "0:00:00.176000",
-  "initTime": "0:00:00.007860",
-  "solveTime": "0:00:00.000259",
-  "variables": 167,
+  "runtime": "0:00:00.220000",
+  "initTime": "0:00:00.018396",
+  "solveTime": "0:00:00.000277",
+  "variables": 184,
   "propagators": 32,
-  "propagations": 619,
+  "propagations": 649,
   "nodes": 11,
   "failures": 3,
   "restarts": 3,
