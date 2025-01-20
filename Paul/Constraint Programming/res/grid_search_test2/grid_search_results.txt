@@ -1,0 +1,39 @@
+Formula, Instances Solved, Details (n, m, formula)
+
+Testing formula: n
+n, 1, [(3, 47, 'n')]
+Runtime for formula n: 1805.41 seconds
+
+Testing formula: m
+m, 1, [(3, 47, 'm')]
+Runtime for formula m: 1805.03 seconds
+
+Testing formula: n*m
+n*m, 1, [(3, 47, 'n*m')]
+Runtime for formula n*m: 1805.13 seconds
+
+Testing formula: n+m
+n+m, 1, [(3, 47, 'n+m')]
+Runtime for formula n+m: 1805.09 seconds
+
+Testing formula: 2*n
+2*n, 1, [(3, 47, '2*n')]
+Runtime for formula 2*n: 1805.05 seconds
+
+Testing formula: 2*m
+2*m, 1, [(3, 47, '2*m')]
+Runtime for formula 2*m: 1805.13 seconds
+
+Testing formula: 2*n*m
+2*n*m, 1, [(3, 47, '2*n*m')]
+Runtime for formula 2*n*m: 1805.13 seconds
+
+Testing formula: 2*(n+m)
+2*(n+m), 1, [(3, 47, '2*(n+m)')]
+Runtime for formula 2*(n+m): 1808.70 seconds
+
+Testing formula: 5*n
+5*n, 1, [(3, 47, '5*n')]
+Runtime for formula 5*n: 1805.10 seconds
+
+Testing formula: 5*m

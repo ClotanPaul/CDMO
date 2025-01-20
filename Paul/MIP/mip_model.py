@@ -36,7 +36,7 @@ def read_dat_file(file_path):
     
     return m, n, capacities, sizes, np.array(distance_matrix)
 
-def solve_mcp(file_path, timeout = 300):
+def solve_mcp(file_path, timeout = 299):
     # Read instance data from the .dat file
     m, n, capacities, sizes, D = read_dat_file(file_path)
     
@@ -60,7 +60,7 @@ def solve_mcp(file_path, timeout = 300):
     z = solver.IntVar(0, solver.infinity(), 'z')
 
     # Set a time limit of 300 seconds (5 minutes)
-    solver.SetTimeLimit(300 * 1000)  # Time limit is in milliseconds
+    solver.SetTimeLimit(timeout * 1000)  # Time limit is in milliseconds
 
     # Objective: Minimize the maximum distance traveled by any courier
     solver.Minimize(z)

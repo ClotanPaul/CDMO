@@ -1,0 +1,176 @@
+
+Processing file: dzn_files/inst11.dzn with formula: n
+inst11.dzn ran but no solution was found within the time limit with restarts=20
+
+Processing file: dzn_files/inst12.dzn with formula: n
+inst12.dzn ran but no solution was found within the time limit with restarts=20
+
+Processing file: dzn_files/inst13.dzn with formula: n
+Success: inst13.dzn solved in 300.28 seconds with restarts=3
+
+Processing file: dzn_files/inst16.dzn with formula: n
+inst16.dzn ran but no solution was found within the time limit with restarts=20
+
+Processing file: dzn_files/inst19.dzn with formula: n
+inst19.dzn ran but no solution was found within the time limit with restarts=20
+
+Processing file: dzn_files/inst21.dzn with formula: n
+inst21.dzn ran but no solution was found within the time limit with restarts=20
+
+Processing file: dzn_files/inst11.dzn with formula: m
+inst11.dzn ran but no solution was found within the time limit with restarts=143
+
+Processing file: dzn_files/inst12.dzn with formula: m
+inst12.dzn ran but no solution was found within the time limit with restarts=95
+
+Processing file: dzn_files/inst13.dzn with formula: m
+Success: inst13.dzn solved in 300.27 seconds with restarts=47
+
+Processing file: dzn_files/inst16.dzn with formula: m
+inst16.dzn ran but no solution was found within the time limit with restarts=47
+
+Processing file: dzn_files/inst19.dzn with formula: m
+inst19.dzn ran but no solution was found within the time limit with restarts=71
+
+Processing file: dzn_files/inst21.dzn with formula: m
+inst21.dzn ran but no solution was found within the time limit with restarts=143
+
+Processing file: dzn_files/inst11.dzn with formula: n*m
+inst11.dzn ran but no solution was found within the time limit with restarts=2860
+
+Processing file: dzn_files/inst12.dzn with formula: n*m
+inst12.dzn ran but no solution was found within the time limit with restarts=1900
+
+Processing file: dzn_files/inst13.dzn with formula: n*m
+Success: inst13.dzn solved in 300.28 seconds with restarts=141
+
+Processing file: dzn_files/inst16.dzn with formula: n*m
+inst16.dzn ran but no solution was found within the time limit with restarts=940
+
+Processing file: dzn_files/inst19.dzn with formula: n*m
+inst19.dzn ran but no solution was found within the time limit with restarts=1420
+
+Processing file: dzn_files/inst21.dzn with formula: n*m
+inst21.dzn ran but no solution was found within the time limit with restarts=2860
+
+Processing file: dzn_files/inst11.dzn with formula: n+m
+inst11.dzn ran but no solution was found within the time limit with restarts=163
+
+Processing file: dzn_files/inst12.dzn with formula: n+m
+inst12.dzn ran but no solution was found within the time limit with restarts=115
+
+Processing file: dzn_files/inst13.dzn with formula: n+m
+Success: inst13.dzn solved in 300.26 seconds with restarts=50
+
+Processing file: dzn_files/inst16.dzn with formula: n+m
+inst16.dzn ran but no solution was found within the time limit with restarts=67
+
+Processing file: dzn_files/inst19.dzn with formula: n+m
+inst19.dzn ran but no solution was found within the time limit with restarts=91
+
+Processing file: dzn_files/inst21.dzn with formula: n+m
+inst21.dzn ran but no solution was found within the time limit with restarts=163
+
+Processing file: dzn_files/inst11.dzn with formula: 2*n
+inst11.dzn ran but no solution was found within the time limit with restarts=40
+
+Processing file: dzn_files/inst12.dzn with formula: 2*n
+inst12.dzn ran but no solution was found within the time limit with restarts=40
+
+Processing file: dzn_files/inst13.dzn with formula: 2*n
+Success: inst13.dzn solved in 300.27 seconds with restarts=6
+
+Processing file: dzn_files/inst16.dzn with formula: 2*n
+inst16.dzn ran but no solution was found within the time limit with restarts=40
+
+Processing file: dzn_files/inst19.dzn with formula: 2*n
+inst19.dzn ran but no solution was found within the time limit with restarts=40
+
+Processing file: dzn_files/inst21.dzn with formula: 2*n
+inst21.dzn ran but no solution was found within the time limit with restarts=40
+
+Processing file: dzn_files/inst11.dzn with formula: 2*m
+inst11.dzn ran but no solution was found within the time limit with restarts=286
+
+Processing file: dzn_files/inst12.dzn with formula: 2*m
+inst12.dzn ran but no solution was found within the time limit with restarts=190
+
+Processing file: dzn_files/inst13.dzn with formula: 2*m
+Success: inst13.dzn solved in 300.28 seconds with restarts=94
+
+Processing file: dzn_files/inst16.dzn with formula: 2*m
+inst16.dzn ran but no solution was found within the time limit with restarts=94
+
+Processing file: dzn_files/inst19.dzn with formula: 2*m
+inst19.dzn ran but no solution was found within the time limit with restarts=142
+
+Processing file: dzn_files/inst21.dzn with formula: 2*m
+inst21.dzn ran but no solution was found within the time limit with restarts=286
+
+Processing file: dzn_files/inst11.dzn with formula: 2*n*m
+inst11.dzn ran but no solution was found within the time limit with restarts=5720
+
+Processing file: dzn_files/inst12.dzn with formula: 2*n*m
+inst12.dzn ran but no solution was found within the time limit with restarts=3800
+
+Processing file: dzn_files/inst13.dzn with formula: 2*n*m
+Success: inst13.dzn solved in 300.27 seconds with restarts=282
+
+Processing file: dzn_files/inst16.dzn with formula: 2*n*m
+inst16.dzn ran but no solution was found within the time limit with restarts=1880
+
+Processing file: dzn_files/inst19.dzn with formula: 2*n*m
+inst19.dzn ran but no solution was found within the time limit with restarts=2840
+
+Processing file: dzn_files/inst21.dzn with formula: 2*n*m
+inst21.dzn ran but no solution was found within the time limit with restarts=5720
+
+Processing file: dzn_files/inst11.dzn with formula: 2*(n+m)
+inst11.dzn ran but no solution was found within the time limit with restarts=326
+
+Processing file: dzn_files/inst12.dzn with formula: 2*(n+m)
+inst12.dzn ran but no solution was found within the time limit with restarts=230
+
+Processing file: dzn_files/inst13.dzn with formula: 2*(n+m)
+Success: inst13.dzn solved in 300.28 seconds with restarts=100
+
+Processing file: dzn_files/inst16.dzn with formula: 2*(n+m)
+inst16.dzn ran but no solution was found within the time limit with restarts=134
+
+Processing file: dzn_files/inst19.dzn with formula: 2*(n+m)
+inst19.dzn ran but no solution was found within the time limit with restarts=182
+
+Processing file: dzn_files/inst21.dzn with formula: 2*(n+m)
+inst21.dzn ran but no solution was found within the time limit with restarts=326
+
+Processing file: dzn_files/inst11.dzn with formula: 5*n
+inst11.dzn ran but no solution was found within the time limit with restarts=100
+
+Processing file: dzn_files/inst12.dzn with formula: 5*n
+inst12.dzn ran but no solution was found within the time limit with restarts=100
+
+Processing file: dzn_files/inst13.dzn with formula: 5*n
+Success: inst13.dzn solved in 300.27 seconds with restarts=15
+
+Processing file: dzn_files/inst16.dzn with formula: 5*n
+inst16.dzn ran but no solution was found within the time limit with restarts=100
+
+Processing file: dzn_files/inst19.dzn with formula: 5*n
+inst19.dzn ran but no solution was found within the time limit with restarts=100
+
+Processing file: dzn_files/inst21.dzn with formula: 5*n
+inst21.dzn ran but no solution was found within the time limit with restarts=100
+
+Processing file: dzn_files/inst11.dzn with formula: 5*m
+inst11.dzn ran but no solution was found within the time limit with restarts=715
+
+Processing file: dzn_files/inst12.dzn with formula: 5*m
+inst12.dzn ran but no solution was found within the time limit with restarts=475
+
+Processing file: dzn_files/inst13.dzn with formula: 5*m
+Success: inst13.dzn solved in 300.29 seconds with restarts=235
+
+Processing file: dzn_files/inst16.dzn with formula: 5*m
+inst16.dzn ran but no solution was found within the time limit with restarts=235
+
+Processing file: dzn_files/inst19.dzn with formula: 5*m

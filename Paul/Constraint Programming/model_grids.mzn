@@ -8,10 +8,12 @@ array[1..n] of int: s;           % demand of each distribution point
 array[1..n+1, 1..n+1] of int: D; % distance matrix (n+1 corresponds to the origin)
 
 % Decision variables
+int: restarts;  % The number of restarts is passed from the Python script
 array[1..m, 1..n+1] of var 1..n+1: x; % x[i, j1] = j2 if courier i goes from j1 to j2, j1 otherwise
 array[1..n] of var 1..m: bins;        % bins[j] indicates which courier handles item j
 
 int: sum_of_row_max = sum([ max([D[i, j] | j in 1..n+1]) | i in 1..n+1 ]);
+
 array[1..m] of var 0..sum_of_row_max: y; % y[i] is the total distance travelled by courier i
 
 
@@ -75,10 +77,10 @@ constraint
     );
 
 solve
-:: restart_luby(n*m) 
-%:: relax_and_reconstruct([x[i, j] | i in 1..m, j in 1..n+1], 80) % Relax 50% of the routes
+:: restart_luby(restarts) 
+:: relax_and_reconstruct([x[i, j] | i in 1..m, j in 1..n+1], 50) % Relax 50% of the routes
 %:: int_search(x, occurance, indomain_median)   % Relax 50% of the decision variables
-:: int_search(x, dom_w_deg, indomain_split)   % Relax 50% of the decision variables
+:: int_search(x, dom_w_deg, indomain_reverse_split)   % Relax 50% of the decision variables
 %satisfy;
 minimize traveled_max_dist;
 

@@ -12,28 +12,28 @@
     8
    ],
    [
-    4,
-    1
-   ],
-   [
     3,
-    7,
-    2
+    5,
+    7
    ],
    [
-    5
+    1,
+    4
+   ],
+   [
+    2
    ]
   ],
-  "runtime": "0:00:00.475000",
-  "initTime": "0:00:00.042368",
-  "solveTime": "0:00:00.174500",
+  "runtime": "0:00:00.342000",
+  "initTime": "0:00:00.041660",
+  "solveTime": "0:00:00.118828",
   "variables": 1207,
   "propagators": 1275,
-  "propagations": 917542,
-  "nodes": 6052,
-  "failures": 1693,
-  "restarts": 50,
-  "peakDepth": 166,
-  "nSolutions": 19
+  "propagations": 34373,
+  "nodes": 959,
+  "failures": 104,
+  "restarts": 1280,
+  "peakDepth": 164,
+  "nSolutions": 12
  }
 }

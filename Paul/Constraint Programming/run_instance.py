@@ -50,8 +50,10 @@ def run_minizinc_on_all(dzn_files_dir, model_file, output_dir, timeout=300):
     # Ensure the output directory exists
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    #list(range(1, 11))+ 
-    instances_to_include = list(range(1, 11))+ [12,13,16,19] #list(range(13, 22))
+    instances_to_include = list(range(1, 11))+ [13,16] #list(range(13, 22))
+
+    #instances_to_include = [16] #list(range(13, 22))
+
 
     for dzn_file in dzn_files:
         # Extract the instance number from the file name
@@ -87,8 +89,6 @@ def run_minizinc_on_all(dzn_files_dir, model_file, output_dir, timeout=300):
                 solutions = traverse_lists(result.solution.x)
                 statistics = result.statistics
         
-                # Parse output to match required JSON structure
-                #print(result)
 
                 #break
                 assignment = result.solution.x
@@ -104,25 +104,13 @@ def run_minizinc_on_all(dzn_files_dir, model_file, output_dir, timeout=300):
                         "optimal": result.status == minizinc.result.Status.OPTIMAL_SOLUTION if runtime < timeout else "False",
                         "obj": max_dist,
                         "sol": solution,
-                        'runtime': str(statistics['time']),
-                        'initTime': str(statistics['initTime']),
-                        'solveTime': str(statistics['solveTime']),
-                        #'solutions': statistics['solutions'],
-                        'variables': statistics['variables'],
-                        'propagators': statistics['propagators'],
-                        'propagations': statistics['propagations'],
-                        'nodes': statistics['nodes'],
-                        'failures': statistics['failures'],
-                        'restarts': statistics['restarts'],
-                        'peakDepth': statistics['peakDepth'],
-                        'nSolutions': statistics['nSolutions'] 
                     }
                 }
 
                 print(f"The output data is: \n{output_data}")
                 
                 # Join the `sol` list into a string manually to avoid line breaks
-                output_data["gecode"]["sol"] = json.loads(json.dumps(solution, separators=(',', ':')))
+                #output_data["gecode"]["sol"] = json.dumps(output_data["gecode"]["sol"]).replace('\n', '')
 
                 # Write the JSON output to a file in the designated subdirectory
                 with open(output_file_path, 'w') as output_file:
@@ -145,7 +133,8 @@ def run_minizinc_on_all(dzn_files_dir, model_file, output_dir, timeout=300):
                 
                 # Write the JSON output to a file in the designated subdirectory
                 with open(output_file_path, 'w') as output_file:
-                    json.dump(output_data, output_file, sort_keys=True)                
+                    json.dump(output_data, output_file, indent, sort_keys=True)
+                    #json.dump(output_data, output_file)                
                 print("Solution output saved to:", output_file_path)
         
         except minizinc.MiniZincError as e:
@@ -177,7 +166,7 @@ def check_solutions_with_external_script(input_folder, results_folder):
 dzn_files_dir = 'dzn_files/'  # Modify this to the directory containing the .dzn files
 
 # Output directory for JSON files
-output_dir = 'res/gecode_test/'  # Modify this as needed
+output_dir = 'res/CP/'  # Modify this as needed
 
 # MiniZinc model file
 model_file = './model.mzn'  # Modify this to the path of your MiniZinc model file
