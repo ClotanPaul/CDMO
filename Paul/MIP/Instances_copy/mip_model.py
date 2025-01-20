@@ -213,6 +213,6 @@ if __name__ == "__main__":
     output_dir = "res/MIP/"      # Directory to store JSON results
     dat_files_dir = '../Instances'
     # Run the solver for all instances
-    run_batch_instances(instance_dir, output_dir, timeout=299)
+    #run_batch_instances(instance_dir, output_dir, timeout=299)
 
     check_solutions_with_external_script(dat_files_dir, output_dir)
