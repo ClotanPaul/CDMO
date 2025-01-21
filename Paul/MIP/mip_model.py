@@ -156,28 +156,40 @@ def solve_mcp(file_path, timeout = 299):
         # Extract solution
         max_dist = solver.Objective().Value()
         solution = []
-        for k in range(m):
+
+        for k in range(m):  # For each courier
             route = []
-            for i in range(num_nodes):
+            current_node = n  # Start at depot
+            while True:
+                found_next = False
                 for j in range(num_nodes):
-                    if x[i, j, k].solution_value() > 0.5:
-                        route.append((i, j))
+                    if x[current_node, j, k].solution_value() > 0.5:  # If edge is part of the route
+                        if j != n:  # Don't include returning to depot yet
+                            route.append(j + 1)
+                        current_node = j
+                        found_next = True
+                        break
+                if not found_next or current_node == n:
+                    break  # End of the route or returned to depot
             solution.append(route)
-        #print(solution)
 
         return {
-            "time": int(runtime) if runtime < timeout else timeout,
-            "optimal": status == pywraplp.Solver.OPTIMAL,
-            "obj": max_dist,
-            "sol": solution
+            "CBC": {
+                "time": int(runtime) if runtime < timeout else int(timeout),
+                "optimal": status == pywraplp.Solver.OPTIMAL,
+                "obj": int(max_dist),
+                "sol": solution  # Sequential route list
+            }
         }
     else:
         return {
-            "time": timeout,
-            "optimal": False,
-            "obj": None,
-            "sol": "NO SOLUTION FOUND"
-        }
+                "CBC": {
+                    "time": timeout,
+                    "optimal": False,
+                    "obj": None,
+                    "sol": "NO SOLUTION FOUND"
+                }
+            }
 
 def run_batch_instances(instance_dir, output_dir, timeout=300):
     """Runs the solver on all instances in a directory and saves results in JSON format."""
@@ -215,4 +227,4 @@ if __name__ == "__main__":
     # Run the solver for all instances
     run_batch_instances(instance_dir, output_dir, timeout=299)
 
-    check_solutions_with_external_script(dat_files_dir, output_dir)
+    check_solutions_with_external_script(instance_dir, output_dir)
