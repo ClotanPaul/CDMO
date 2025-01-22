@@ -32,14 +32,41 @@ def traverse_lists(lists):
         solution.append(visited)
     return solution
 
-def run_minizinc_on_all(dzn_files_dir, model_file, output_dir, timeout=300):
+def save_solution(output_file_path, solver_key, new_data):
+    """
+    Appends or updates the solution under the specified solver key in the JSON file.
+    
+    Args:
+        output_file_path (str): Path to the JSON file.
+        solver_key (str): Key under which the solution should be stored.
+        new_data (dict): New solution data to add or update.
+    """
+    if os.path.exists(output_file_path):
+        # Load existing JSON content
+        with open(output_file_path, 'r') as f:
+            try:
+                existing_content = json.load(f)
+            except json.JSONDecodeError:
+                existing_content = {}  # Start fresh if the file is invalid
+    else:
+        existing_content = {}
+
+    # Update or add the new data under the solver key
+    existing_content[solver_key] = new_data
+
+    # Write the updated content back to the file
+    with open(output_file_path, 'w') as f:
+        json.dump(existing_content, f, indent=1)
+
+
+def run_minizinc_on_all(dzn_files_dir, model_file, output_dir, timeout=300, solver = "gecode", symmetry_breaking = False):
     """
     Runs the MiniZinc model on all the .dzn files in the specified directory, saves the output as JSON, 
     and reports the runtime. Limits each Gecode run to a specified timeout and returns the solution or a message if unsolved.
     """
     # Initialize MiniZinc model and configure solver
     model = minizinc.Model(model_file)
-    chuffed = minizinc.Solver.lookup("gecode")
+    chuffed = minizinc.Solver.lookup(solver)
     
     # Find all .dzn files in the specified directory
     dzn_files = sorted([f for f in os.listdir(dzn_files_dir) if f.endswith('.dzn')])
@@ -50,6 +77,8 @@ def run_minizinc_on_all(dzn_files_dir, model_file, output_dir, timeout=300):
     # Ensure the output directory exists
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
+
+
     instances_to_include = list(range(1, 11))+ [13,16] #list(range(13, 22))
 
     #instances_to_include = [16] #list(range(13, 22))
@@ -89,22 +118,22 @@ def run_minizinc_on_all(dzn_files_dir, model_file, output_dir, timeout=300):
                 solutions = traverse_lists(result.solution.x)
                 statistics = result.statistics
         
-
                 #break
                 assignment = result.solution.x
                 max_dist = result.solution.objective
 
                 # Transform the assignment `x` to the solution format
                 solution = traverse_lists(assignment)
+                solver_key = solver  # e.g., "gecode"
+                if symmetry_breaking:
+                    solver_key += "_symbreak"
 
                 # Create the JSON output in the required format
                 output_data = {
-                    "gecode": {
                         "time": int(runtime) if runtime < timeout else timeout,
-                        "optimal": result.status == minizinc.result.Status.OPTIMAL_SOLUTION if runtime < timeout else "False",
+                        "optimal": result.status == minizinc.result.Status.OPTIMAL_SOLUTION if runtime < timeout else False,
                         "obj": max_dist,
                         "sol": solution,
-                    }
                 }
 
                 print(f"The output data is: \n{output_data}")
@@ -113,8 +142,9 @@ def run_minizinc_on_all(dzn_files_dir, model_file, output_dir, timeout=300):
                 #output_data["gecode"]["sol"] = json.dumps(output_data["gecode"]["sol"]).replace('\n', '')
 
                 # Write the JSON output to a file in the designated subdirectory
-                with open(output_file_path, 'w') as output_file:
-                    json.dump(output_data, output_file, indent=1)
+                save_solution(output_file_path, solver_key, output_data)
+                #with open(output_file_path, 'w') as output_file:
+                #    json.dump(output_data, output_file, indent=1)
                 
                 print(f"Success: {dzn_file} ran in {runtime:.2f} seconds")
                 print("Solution output saved to:", output_file_path)
@@ -123,7 +153,7 @@ def run_minizinc_on_all(dzn_files_dir, model_file, output_dir, timeout=300):
                 output_data = {
                     "gecode": {
                         "time": 300,
-                        "optimal": "FALSE",
+                        "optimal": "False",
                         "obj": "NULL",
                         "sol": "NO SOLUTION FOUND",
                     }
@@ -132,10 +162,10 @@ def run_minizinc_on_all(dzn_files_dir, model_file, output_dir, timeout=300):
                 print(f"The output data is: \n{output_data}")
                 
                 # Write the JSON output to a file in the designated subdirectory
-                with open(output_file_path, 'w') as output_file:
-                    json.dump(output_data, output_file, indent, sort_keys=True)
+                #with open(output_file_path, 'w') as output_file:
+                #    json.dump(output_data, output_file, indent, sort_keys=True)
                     #json.dump(output_data, output_file)                
-                print("Solution output saved to:", output_file_path)
+                #print("Solution output saved to:", output_file_path)
         
         except minizinc.MiniZincError as e:
             print(f"MiniZincError: {dzn_file} failed")
@@ -169,11 +199,22 @@ dzn_files_dir = 'dzn_files/'  # Modify this to the directory containing the .dzn
 output_dir = 'res/CP/'  # Modify this as needed
 
 # MiniZinc model file
-model_file = './model.mzn'  # Modify this to the path of your MiniZinc model file
-
 # Run the MiniZinc model on all .dzn files
 # Uncomment the next line to run the instances and automatically save in separate folders
-run_minizinc_on_all(dzn_files_dir, model_file, output_dir, 300)
+
+solvers = ["gecode", "chuffed"]
+model_files = ['./model.mzn', './model_restart_symbreak.mzn']  # Modify this to the path of your MiniZinc model file
+
+for solver in solvers:
+    for model_file in model_files:
+        symmetry_breaking = False
+        if model_file != model_files[0]:
+            symmetry_breaking = True
+        if symmetry_breaking:
+            print(f"\n\n\nUSING SOLVER: {solver}, with SB")
+        else:
+            print(f"\n\n\nUSING SOLVER: {solver}")
+        run_minizinc_on_all(dzn_files_dir, model_file, output_dir, 300, solver = solver, symmetry_breaking = symmetry_breaking)
 
 # Call the external solution checker script to validate the outputs
 # Pass the output directory directly (as JSON files are stored there)

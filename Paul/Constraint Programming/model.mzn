@@ -56,26 +56,14 @@ constraint forall(j in 1..n) (
     count([x[i, j] != j | i in 1..m], true) == 1
 );
 
-
-% If two couriers have the same load, we ensure their routes are lexicographically ordered to break symmetry.
-constraint
-    forall(i in 1..m-1, z in i+1..m where l[i] == l[z]) (
-        lex_less([x[i, k] | k in 1..n+1], [x[z, k] | k in 1..n+1])
-    );
-
-constraint
-    forall(i, j in 1..m where i < j /\ l[i] >= l[j]) (
-        (exists(k in 1..n) (x[i, k] != k) /\ exists(k in 1..n) (x[j, k] != k)) -> 
-        sum([s[k] | k in 1..n where x[i, k] != k]) >= sum([s[k] | k in 1..n where x[j, k] != k])
-    );
-
 constraint
     forall(i in 1..m)(
         subcircuit([x[i, j] | j in 1..n+1])  % Ensure each courier's route forms a valid subcircuit
     );
 
+
 solve
-:: restart_luby(n*m) 
+%:: restart_luby(n*m) 
 %:: relax_and_reconstruct([x[i, j] | i in 1..m, j in 1..n+1], 80) % Relax 50% of the routes
 %:: int_search(x, occurance, indomain_median)   % Relax 50% of the decision variables
 :: int_search(x, dom_w_deg, indomain_split)   % Relax 50% of the decision variables
