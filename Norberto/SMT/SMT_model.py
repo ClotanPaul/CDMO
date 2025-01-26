@@ -176,7 +176,6 @@ def stm_model(instance, timeout, sb):
 def format_solution(instance, model, x):
     m = instance["m"]  # couriers
     n = instance["n"]  # packages
-    print(model)
     pk_bound = n  # max number of packages a courier can carry
     step_courier = []
     for i in range(m):
