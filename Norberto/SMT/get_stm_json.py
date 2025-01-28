@@ -2,6 +2,7 @@ from SMT_model import *
 from time import time as time_clock
 from z3 import IntNumRef
 import json
+import subprocess
 
 timeout = 300
 
@@ -9,7 +10,7 @@ def run_smt(instance, timeout, sb=False):
     generation_start_time = time_clock()
 
     # Build the SMT model
-    o, x, max_distance = stm_model(instance, timeout, sb)
+    o, x, max_distance = stm_model(instance, sb)
     generation_duration = time_clock() - generation_start_time
     o.set("timeout", int(timeout - generation_duration) * 1000)
 
@@ -56,7 +57,7 @@ def all_solutions(solvers, solutions):
             return [convert(i) for i in obj]
         return obj
     
-    output_data = []
+    output_data = {}
     sol_index=0
     for solver in solvers:
         solution = solutions[sol_index]
@@ -67,7 +68,7 @@ def all_solutions(solvers, solutions):
         elif solution[0] == "No solution found":
             print("No solution found for solver", solver)
         else:
-            output_data.append({
+            output_data.update({
                 solver:
                     {
                     "time": convert(solution[3]),
@@ -89,7 +90,7 @@ def save_solution(solvers ,solutions, path):
             
 #Run the SMT model for all the instances and saves the solutions in json files.
 def run_all_instances():
-    for i in range(1, 10):
+    for i in range(1, 11):
         if i < 10:
             Path = f'../Instances/inst0{i}.dat'
         else:
@@ -100,6 +101,28 @@ def run_all_instances():
         instance = data_parsing(data)
         solution_smt = run_smt(instance, timeout, False)
         solution_smt_sb = run_smt(instance, timeout, True)
-        save_solution(["smt", "smt_sb"], [solution_smt, solution_smt_sb], f'Solutions/instance{i}.json')
+        if i < 10:
+            save_solution(["smt", "smt_sb"], [solution_smt, solution_smt_sb], f'res/SMT/inst0{i}/inst0{i}.json')
+        else:
+            save_solution(["smt", "smt_sb"], [solution_smt, solution_smt_sb], f'res/SMT/inst{i}/inst{i}.json')
+        
+        
+def check_solutions_with_external_script(input_folder, results_folder):
+    """
+    Calls the external solution checker script using subprocess to check all generated solutions.
+    """
+    try:
+        # Call the solution checker, passing the input folder and results folder
+        subprocess.run(["python", "solution_checker.py", input_folder, results_folder], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Solution checker failed with error: {str(e)}")
         
 run_all_instances()
+
+# Directory where dat files are stored
+instance_dir = '../Instances'  
+
+# Output directory for JSON files
+output_dir = 'res/SMT/'
+
+check_solutions_with_external_script(instance_dir, output_dir)  

@@ -2,6 +2,8 @@ from z3 import *
 import re
 import numpy as np
 
+# Parse the data from the file, to get the number of couriers, packages, weights, sizes and distances as matrices
+# computable by the model
 def data_parsing(data):
     text = data.split("\n")
     num_reg = r"(\d+)"
@@ -24,10 +26,10 @@ def data_parsing(data):
         "D": D,
     }
 
-
-def maxv(vs):
-    m = vs[0]
-    for x in vs[1:]:
+# Custom function to get the maximum value of a list of values
+def max_comparison(value):
+    m = value[0]
+    for x in value[1:]:
         m = If(x > m, x, m)
     return m
 
@@ -35,7 +37,7 @@ def maxv(vs):
 def get_list_of_values(ll, j):
     return [If(x == j, 1, 0) for l in ll for x in l]
 
-
+# Custom function to calculate the maximum distance a courier can travel
 def maxdist_calc(distances, pk_bound):
     vertical_distance = np.sum(np.max(distances, axis=1))
     sorted_distance = np.sum(sorted(distances.flatten(), reverse=True)[: pk_bound + 1])
@@ -44,44 +46,47 @@ def maxdist_calc(distances, pk_bound):
     return max_dist
 
 
-def stm_model(instance, timeout, sb):
+def stm_model(instance, sb):
     m = instance["m"]  # couriers
     n = instance["n"]  # packages
-    l = instance["l"]  # weights
+    l = instance["l"]  # loads of couriers
     s = instance["s"]  # sizes of couriers
-    pk_bound = n
+    pk_bound = n # max number of packages a courier can carry
 
     distances = np.array(instance["D"])
-
+    
+    # Calculate the minimum and maximum values for the decision variables
     min_load = np.min(s)
     max_load = min(np.max(l), np.sum(sorted(s, reverse=True)[:pk_bound]))
     max_dist = maxdist_calc(distances, pk_bound)
     min_solution = np.max([distances[n, j] + distances[j, n] for j in range(n)])
     
-    # casting integers to z3 integers
+    # Cast the values to z3 IntVal
     max_load = IntVal(f"{max_load}")
     min_load = IntVal(f"{min_load}")
     max_dist = IntVal(f"{max_dist}")
     min_solution = IntVal(f"{min_solution}")
 
     o = Optimize()
+    
+    #Decision variables
 
-    # main decision variable: x[i,k] = j mean that the i-th courier is in j at pk_bound k
+    # Main decision variables: x[i][k] are the packages carried by courier i in the k-th step
     x = [
         [Int(f"x_{i}_{k}") for k in range(0, pk_bound + 1)]
         for i in range(m)
     ]
 
-    # variable for distance calculation
+    # This variable is used to store the distance travelled by each courier
     y = [Int(f"y_{i}") for i in range(m)]
 
-    # variable for loads calculation
+    # This variable is used to store the load of each courier
     load = [Int(f"load_{i}") for i in range(m)]
 
-    # distance to minimize
+    # The value to minimize
     max_distance = Int(f"max_distance")
 
-    # we define distances as a z3 array because it is easier to indicize
+    # We need to indicize the distances array to be able to use it in the model
     distances = Array("distances", IntSort(), ArraySort(IntSort(), IntSort()))
     for j in range(n + 1):
         for j1 in range(n + 1):
@@ -93,9 +98,9 @@ def stm_model(instance, timeout, sb):
         o.add(s[j] == instance["s"][j])
     o.add(s[n] == 0)
 
-    ####################################### CONSTRAINTS #######################################
+    #Constraints
 
-    # define possible value for x[i][k]
+    # Possible values for x[i][k] are between 0 and n
     o.add(
         [
             And(x[i][k] >= 0, x[i][k] <= n)
@@ -105,7 +110,7 @@ def stm_model(instance, timeout, sb):
     )
     o.add([And(x[i][0] == n, x[i][pk_bound] == n) for i in range(m)])
 
-    # for each i foreach k, each x[i][k] must be different, unless it is equal to n.
+    # Each position in the array must be different, unless it is the last one
     for j in range(n):
         o.add(
             [
@@ -119,26 +124,27 @@ def stm_model(instance, timeout, sb):
             ]
         )
 
-    # for each i, the sum of the weights of the packages carried by the courier i must be less than the capacity of the courier i
+    # For each courier, their maximum load must be respected given the sum of the packages they carry
     for i in range(m):
         o.add(load[i] == Sum([s[x[i][k]] for k in range(1, pk_bound)]))
         o.add(load[i] <= l[i])
 
-    # bound to loads array
+    # The loads must be in range
     for i in range(m):
         o.add(And(load[i] >= min_load, load[i] <= max_load))
 
     # Total items size less than total couriers capacity
     o.add(Sum([load[i] for i in range(m)]) >= Sum([s[j] for j in range(n)]))
 
-    ####################################### SYMMETRY BREAKING CONSTRAINTS #######################################
+    # Symmetry breaking constraints
+    
     if sb:
-        # once a courier i return to the depot, it cant deliver other packages
+        # Once a courier returns to the depot, it cant deliver other packages
         for i in range(m):
             for k in range(1, pk_bound):
                 o.add(Implies(x[i][k] == n, x[i][k + 1] == n))
 
-        # lexycographic constraint between couriers with == capacity
+        # Lexycographic constraint between couriers with the same capacity
         for i1 in range(m - 1):
             for i2 in range(i1 + 1, m):
                 o.add(
@@ -148,13 +154,8 @@ def stm_model(instance, timeout, sb):
                         <= If(x[i1][1] != n, x[i1][1], -1),
                     )
                 )
-
-        # constraint over maximum loads of the couriers
-        for i1 in range(m - 1):
-            for i2 in range(i1 + 1, m):
-                o.add(Implies(l[i1] <= l[i2], load[i1] <= load[i2]))
-
-    ####################################### OBJECTIVE FUNCTION #######################################
+        
+    # Reach objective function
 
     # distances array
     for i in range(m):
@@ -165,7 +166,7 @@ def stm_model(instance, timeout, sb):
         o.add(y[i] <= max_dist)
 
     # variable to minimize
-    o.add(max_distance == maxv(y))
+    o.add(max_distance == max_comparison(y))
 
     # bound the variable to minimize
     o.add(max_distance >= min_solution)
