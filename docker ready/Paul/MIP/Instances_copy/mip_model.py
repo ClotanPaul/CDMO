@@ -11,7 +11,7 @@ def check_solutions_with_external_script(input_folder, results_folder):
     """
     try:
         # Call the solution checker, passing the input folder and results folder
-        subprocess.run(["python3", "solution_checker.py", input_folder, results_folder], check=True)
+        subprocess.run(["python", "solution_checker.py", input_folder, results_folder], check=True)
     except subprocess.CalledProcessError as e:
         print(f"Solution checker failed with error: {str(e)}")
 
@@ -156,40 +156,28 @@ def solve_mcp(file_path, timeout = 299):
         # Extract solution
         max_dist = solver.Objective().Value()
         solution = []
-
-        for k in range(m):  # For each courier
+        for k in range(m):
             route = []
-            current_node = n  # Start at depot
-            while True:
-                found_next = False
+            for i in range(num_nodes):
                 for j in range(num_nodes):
-                    if x[current_node, j, k].solution_value() > 0.5:  # If edge is part of the route
-                        if j != n:  # Don't include returning to depot yet
-                            route.append(j + 1)
-                        current_node = j
-                        found_next = True
-                        break
-                if not found_next or current_node == n:
-                    break  # End of the route or returned to depot
+                    if x[i, j, k].solution_value() > 0.5:
+                        route.append((i, j))
             solution.append(route)
+        #print(solution)
 
         return {
-            "CBC": {
-                "time": int(runtime) if runtime < timeout else int(timeout),
-                "optimal": status == pywraplp.Solver.OPTIMAL,
-                "obj": int(max_dist),
-                "sol": solution  # Sequential route list
-            }
+            "time": int(runtime) if runtime < timeout else timeout,
+            "optimal": status == pywraplp.Solver.OPTIMAL,
+            "obj": max_dist,
+            "sol": solution
         }
     else:
         return {
-                "CBC": {
-                    "time": timeout,
-                    "optimal": False,
-                    "obj": None,
-                    "sol": "NO SOLUTION FOUND"
-                }
-            }
+            "time": timeout,
+            "optimal": False,
+            "obj": None,
+            "sol": "NO SOLUTION FOUND"
+        }
 
 def run_batch_instances(instance_dir, output_dir, timeout=300):
     """Runs the solver on all instances in a directory and saves results in JSON format."""
@@ -204,7 +192,7 @@ def run_batch_instances(instance_dir, output_dir, timeout=300):
 
         try:
             result = solve_mcp(instance_path)
-            print(result)
+
             # Create a subdirectory for the instance
             instance_name = os.path.splitext(instance_file)[0]
             instance_output_dir = os.path.join(output_dir, instance_name)
@@ -225,6 +213,6 @@ if __name__ == "__main__":
     output_dir = "res/MIP/"      # Directory to store JSON results
     dat_files_dir = '../Instances'
     # Run the solver for all instances
-    run_batch_instances(instance_dir, output_dir, timeout=299)
+    #run_batch_instances(instance_dir, output_dir, timeout=299)
 
-    check_solutions_with_external_script(instance_dir, output_dir)
+    check_solutions_with_external_script(dat_files_dir, output_dir)

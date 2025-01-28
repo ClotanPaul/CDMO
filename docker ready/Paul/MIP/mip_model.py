@@ -10,7 +10,6 @@ def check_solutions_with_external_script(input_folder, results_folder):
     Calls the external solution checker script using subprocess to check all generated solutions.
     """
     try:
-        # Call the solution checker, passing the input folder and results folder
         subprocess.run(["python3", "solution_checker.py", input_folder, results_folder], check=True)
     except subprocess.CalledProcessError as e:
         print(f"Solution checker failed with error: {str(e)}")
@@ -35,25 +34,14 @@ def read_dat_file(file_path):
     for line in lines[4:]:
         distance_matrix.append(list(map(int, line.strip().split())))
     
-    # Print the parsed input variables
-    #print("Number of couriers (m):", m)
-    #print("Number of items (n):", n)
-    #print("Courier capacities:", capacities)
-    #print("Item sizes:", sizes)
-    #print("Distance matrix:")
-    #for row in distance_matrix:
-    #    print(row)
-    
     return m, n, capacities, sizes, np.array(distance_matrix)
 
-def solve_mcp(file_path, timeout = 299):
+def solve_mcp(file_path, timeout = 300):
     # Read instance data from the .dat file
     m, n, capacities, sizes, D = read_dat_file(file_path)
     
-    # Adjust indexing: depot is node n, customers are nodes 0 to n-1
-    num_nodes = n + 1  # Including depot
+    num_nodes = n + 1  # Including depot(origin point)
 
-    # Create the OR-Tools solver with CBC backend
     solver = pywraplp.Solver.CreateSolver('CBC')
     if not solver:
         print("Solver not found!")
@@ -70,34 +58,33 @@ def solve_mcp(file_path, timeout = 299):
     z = solver.IntVar(0, solver.infinity(), 'z')
 
     lower_bound = max(
-        max(D[n, j] + D[j, n] for j in range(num_nodes - 1)),  # Depot to farthest point and back
-        max(D[i, j] for i in range(num_nodes - 1) for j in range(num_nodes - 1) if i != j)  # Max distance between customers
+        max(D[n, j] + D[j, n] for j in range(num_nodes - 1)),  
+        max(D[i, j] for i in range(num_nodes - 1) for j in range(num_nodes - 1) if i != j)  
     )
     upper_bound = sum(
         max(D[i, j] for j in range(num_nodes)) for i in range(num_nodes)
-    ) + max(D[n, j] + D[j, n] for j in range(num_nodes - 1))  # All customers served independently
+    ) + max(D[n, j] + D[j, n] for j in range(num_nodes - 1)) 
 
     # Set bounds on the objective variable
     solver.Add(z >= lower_bound)
     solver.Add(z <= upper_bound)
 
-    # Set a time limit of 300 seconds (5 minutes)
-    solver.SetTimeLimit(timeout * 1000)  # Time limit is in milliseconds
+    # Set the time limit
+    solver.SetTimeLimit(timeout * 1000)
 
-    # Objective: Minimize the maximum distance traveled by any courier
     solver.Minimize(z)
 
     # Constraints
-    # 1. Each customer must be visited exactly once
-    for j in range(num_nodes - 1):  # Customer nodes 0 to n-1
+    # 1. Each distribution point must be visited exactly once
+    for j in range(num_nodes - 1):  
         solver.Add(
             sum(x[i, j, k] for i in range(num_nodes) if i != j for k in range(m)) == 1
         )
     
-    # 2. Flow conservation constraints for customers
-    # For every customer node, the sum of incoming flows equals the sum of outgoing flows
+    # 2. Flow conservation constraints for distribution points
+    # For every distribution point node, the sum of incoming flows equals the sum of outgoing flows
     for k in range(m):
-        for j in range(num_nodes - 1):  # Customer nodes 0 to n-1
+        for j in range(num_nodes - 1): 
             solver.Add(
                 sum(x[i, j, k] for i in range(num_nodes) if i != j) ==
                 sum(x[j, i, k] for i in range(num_nodes) if i != j)
@@ -131,8 +118,8 @@ def solve_mcp(file_path, timeout = 299):
 
     # Add MTZ constraints
     for k in range(m):
-        for i in range(num_nodes - 1):  # Customer nodes
-            for j in range(num_nodes - 1):  # Customer nodes
+        for i in range(num_nodes - 1):  
+            for j in range(num_nodes - 1): 
                 if i != j:
                     solver.Add(u[i, k] - u[j, k] + n * x[i, j, k] <= n - 1)
     
@@ -146,25 +133,25 @@ def solve_mcp(file_path, timeout = 299):
         solver.Add(y[k] == total_distance)
         solver.Add(z >= y[k])
 
-    # Solve the problem
+
     start_time = time.time()
     status = solver.Solve()
     end_time = time.time()
     runtime = end_time - start_time
 
     if status in (pywraplp.Solver.OPTIMAL, pywraplp.Solver.FEASIBLE):
-        # Extract solution
+        
         max_dist = solver.Objective().Value()
         solution = []
 
-        for k in range(m):  # For each courier
+        for k in range(m):  
             route = []
-            current_node = n  # Start at depot
+            current_node = n  
             while True:
                 found_next = False
                 for j in range(num_nodes):
                     if x[current_node, j, k].solution_value() > 0.5:  # If edge is part of the route
-                        if j != n:  # Don't include returning to depot yet
+                        if j != n:  
                             route.append(j + 1)
                         current_node = j
                         found_next = True
@@ -178,7 +165,7 @@ def solve_mcp(file_path, timeout = 299):
                 "time": int(runtime) if runtime < timeout else int(timeout),
                 "optimal": status == pywraplp.Solver.OPTIMAL,
                 "obj": int(max_dist),
-                "sol": solution  # Sequential route list
+                "sol": solution  
             }
         }
     else:
@@ -205,12 +192,11 @@ def run_batch_instances(instance_dir, output_dir, timeout=300):
         try:
             result = solve_mcp(instance_path)
             print(result)
-            # Create a subdirectory for the instance
+
             instance_name = os.path.splitext(instance_file)[0]
             instance_output_dir = os.path.join(output_dir, instance_name)
             os.makedirs(instance_output_dir, exist_ok=True)
 
-            # Save result to JSON file
             output_file = os.path.join(instance_output_dir, f"{instance_name}.json")
             with open(output_file, 'w') as f:
                 json.dump(result, f, indent=4)
@@ -220,11 +206,9 @@ def run_batch_instances(instance_dir, output_dir, timeout=300):
             print(f"Error processing {instance_path}: {e}")
 
 if __name__ == "__main__":
-    # Define instance directory and output directory
-    instance_dir = "Instances_copy"  # Directory containing .dat files
-    output_dir = "res/MIP/"      # Directory to store JSON results
+    instance_dir = "Instances_copy"  
+    output_dir = "res/MIP/"      
     dat_files_dir = '../Instances'
-    # Run the solver for all instances
-    run_batch_instances(instance_dir, output_dir, timeout=299)
+    run_batch_instances(instance_dir, output_dir, timeout=300)
 
     check_solutions_with_external_script(instance_dir, output_dir)
