@@ -61,7 +61,7 @@ def solve_mcp(file_path, solver_type, timeout = 300):
         max(D[i, j] for j in range(num_nodes)) for i in range(num_nodes)
     ) + max(D[n, j] + D[j, n] for j in range(num_nodes - 1)) )
 
-    y = [solver.IntVar(0, solver.infinity(), f'y_{k}') for k in range(m)]
+    y = [solver.IntVar(0, upper_bound, f'y_{k}') for k in range(m)]
     z = solver.IntVar(lower_bound, upper_bound, 'z')
 
     # Set the time limit
@@ -169,7 +169,7 @@ def run_batch_instances(instance_dir, output_dir, timeout=300):
         os.makedirs(output_dir)
 
     instance_files = sorted([f for f in os.listdir(instance_dir) if f.endswith('.dat')])
-    instances_to_include = [13] #list(range(1, 11))+ [13,16] 
+    instances_to_include = [1] #list(range(1, 11))+ [13,16] 
 
     for instance_file in instance_files:
         instance_number = int(''.join(filter(str.isdigit, instance_file)))
@@ -203,9 +203,9 @@ def run_batch_instances(instance_dir, output_dir, timeout=300):
             print(f"Error processing {instance_path}: {e}")
 
 if __name__ == "__main__":
-    instance_dir = "D:\\personal\\uni\\cdo\\project\\Instances"  
-    output_dir = "D:\\personal\\uni\\cdo\\project\\res\\MIP\\"      
-    dat_files_dir = 'D:\\personal\\uni\\cdo\\project\\Instances'
+    instance_dir = "Instances copy"  
+    output_dir = "res/MIP/"      
+    dat_files_dir = '../Instances'
     run_batch_instances(instance_dir, output_dir, timeout=300)
 
     #check_solutions_with_external_script(instance_dir, output_dir)
