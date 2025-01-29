@@ -3,8 +3,12 @@ from time import time as time_clock
 from z3 import IntNumRef
 import json
 import subprocess
+import argparse
 
 timeout = 300
+
+#Set the seed for z3
+set_param("smt.random_seed", 42)
 
 def run_smt(instance, timeout, sb=False):
     generation_start_time = time_clock()
@@ -105,6 +109,22 @@ def run_all_instances():
             save_solution(["smt", "smt_sb"], [solution_smt, solution_smt_sb], f'res/SMT/inst0{i}/inst0{i}.json')
         else:
             save_solution(["smt", "smt_sb"], [solution_smt, solution_smt_sb], f'res/SMT/inst{i}/inst{i}.json')
+
+def run_single_instance(n):
+    if n < 10:
+        Path = f'../Instances/inst0{n}.dat'
+    else:
+        Path = f'../Instances/inst{n}.dat'
+    with open(Path, 'r') as file:
+        data = file.read()
+    instance = data_parsing(data)
+    solution_smt = run_smt(instance, timeout, False)
+    #solution_smt_sb = run_smt(instance, timeout, True)
+    solution_smt_sb = "unsat"
+    if n < 10:
+        save_solution(["smt", "smt_sb"], [solution_smt, solution_smt_sb], f'res/SMT/inst0{n}/inst0{n}.json')
+    else:
+        save_solution(["smt", "smt_sb"], [solution_smt, solution_smt_sb], f'res/SMT/inst{n}/inst{n}.json')
         
         
 def check_solutions_with_external_script(input_folder, results_folder):
@@ -116,8 +136,6 @@ def check_solutions_with_external_script(input_folder, results_folder):
         subprocess.run(["python", "solution_checker.py", input_folder, results_folder], check=True)
     except subprocess.CalledProcessError as e:
         print(f"Solution checker failed with error: {str(e)}")
-        
-run_all_instances()
 
 # Directory where dat files are stored
 instance_dir = '../Instances'  
@@ -125,4 +143,22 @@ instance_dir = '../Instances'
 # Output directory for JSON files
 output_dir = 'res/SMT/'
 
-check_solutions_with_external_script(instance_dir, output_dir)  
+parser = argparse.ArgumentParser(description="Run STM instances.")
+parser.add_argument("instance", type=int, nargs="?", default=-1, help="The instance number to run (1-21). If not specified, all instances will be run.")
+
+args = parser.parse_args()
+instance_number = -1
+# Determine the instances to run
+if args.instance == -1:
+    #run_all_instances()
+    check_solutions_with_external_script(instance_dir, output_dir) 
+elif 1 <= args.instance <= 21:
+    instance_number = args.instance
+    run_single_instance(instance_number)  # Run only the specified instance
+    check_solutions_with_external_script(instance_dir, output_dir)
+ 
+else:
+    print("Error: Instance number must be between 1 and 21.")
+    exit(1)
+    
+
