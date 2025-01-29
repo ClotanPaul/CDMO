@@ -1,6 +1,19 @@
 from ortools.linear_solver import pywraplp
 import numpy as np
+import os 
+import json
 import time
+import subprocess
+import math
+
+def check_solutions_with_external_script(input_folder, results_folder):
+    """
+    Calls the external solution checker script using subprocess to check all generated solutions.
+    """
+    try:
+        subprocess.run(["python3", "D:/personal/uni/cdo/project/solution_checker.py", input_folder, results_folder], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Solution checker failed with error: {str(e)}")
 
 def read_dat_file(file_path):
     """Parse the .dat file to extract instance data."""
@@ -21,34 +34,16 @@ def read_dat_file(file_path):
     distance_matrix = []
     for line in lines[4:]:
         distance_matrix.append(list(map(int, line.strip().split())))
-
-    # Print the parsed input variables
-    print("Number of couriers (m):", m)
-    print("Number of items (n):", n)
-    print("Courier capacities:", capacities)
-    print("Item sizes:", sizes)
-    print("Distance matrix:")
-    for row in distance_matrix:
-        print(row)
     
     return m, n, capacities, sizes, np.array(distance_matrix)
 
-def is_symmetric(D):
-    """Check if the distance matrix D is symmetric."""
-    return np.array_equal(D, D.T)
-
-def solve_mcp(file_path):
+def solve_mcp(file_path, solver_type, timeout = 300):
     # Read instance data from the .dat file
     m, n, capacities, sizes, D = read_dat_file(file_path)
     
-    # Adjust indexing: depot is node n, customers are nodes 0 to n-1
-    num_nodes = n + 1  # Including depot
+    num_nodes = n + 1  # Including depot(origin point)
 
-    # Create the OR-Tools solver with CBC backend
-    solver = pywraplp.Solver.CreateSolver('CBC')
-    if not solver:
-        print("Solver not found!")
-        return
+    solver = pywraplp.Solver.CreateSolver(solver_type)
 
     # Decision variables
     x = {}
@@ -57,26 +52,34 @@ def solve_mcp(file_path):
             for j in range(num_nodes):
                 x[i, j, k] = solver.BoolVar(f'x_{i}_{j}_{k}')
 
+
+    lower_bound = math.ceil(max(
+        max(D[n, j] + D[j, n] for j in range(num_nodes - 1)),  
+        max(D[i, j] for i in range(num_nodes - 1) for j in range(num_nodes - 1) if i != j)  
+    ))
+    upper_bound = math.ceil(sum(
+        max(D[i, j] for j in range(num_nodes)) for i in range(num_nodes)
+    ) + max(D[n, j] + D[j, n] for j in range(num_nodes - 1)) )
+
     y = [solver.IntVar(0, solver.infinity(), f'y_{k}') for k in range(m)]
-    z = solver.IntVar(0, solver.infinity(), 'z')
+    z = solver.IntVar(lower_bound, upper_bound, 'z')
 
-    # Set a time limit of 300 seconds (5 minutes)
-    solver.SetTimeLimit(300 * 1000)  # Time limit is in milliseconds
+    # Set the time limit
+    solver.SetTimeLimit(timeout * 1000)
 
-    # Objective: Minimize the maximum distance traveled by any courier
     solver.Minimize(z)
 
     # Constraints
-    # 1. Each customer must be visited exactly once
-    for j in range(num_nodes - 1):  # Customer nodes 0 to n-1
+    # 1. Each distribution point must be visited exactly once
+    for j in range(num_nodes - 1):  
         solver.Add(
             sum(x[i, j, k] for i in range(num_nodes) if i != j for k in range(m)) == 1
         )
     
-    # 2. Flow conservation constraints for customers
-    # For every customer node, the sum of incoming flows equals the sum of outgoing flows
+    # 2. Flow conservation constraints for distribution points
+    # For every distribution point node, the sum of incoming flows equals the sum of outgoing flows
     for k in range(m):
-        for j in range(num_nodes - 1):  # Customer nodes 0 to n-1
+        for j in range(num_nodes - 1): 
             solver.Add(
                 sum(x[i, j, k] for i in range(num_nodes) if i != j) ==
                 sum(x[j, i, k] for i in range(num_nodes) if i != j)
@@ -110,8 +113,8 @@ def solve_mcp(file_path):
 
     # Add MTZ constraints
     for k in range(m):
-        for i in range(num_nodes - 1):  # Customer nodes
-            for j in range(num_nodes - 1):  # Customer nodes
+        for i in range(num_nodes - 1):  
+            for j in range(num_nodes - 1): 
                 if i != j:
                     solver.Add(u[i, k] - u[j, k] + n * x[i, j, k] <= n - 1)
     
@@ -125,62 +128,84 @@ def solve_mcp(file_path):
         solver.Add(y[k] == total_distance)
         solver.Add(z >= y[k])
 
-    #symmetry breaking:
-    # Binary variables indicating whether courier k is used
-    sym = [solver.BoolVar(f'sym_{k}') for k in range(m)]
 
-    # Link sym[k] to whether courier k is used
-    for k in range(m):
-        solver.Add(sym[k] >= solver.Sum(x[i, j, k] for i in range(num_nodes) for j in range(num_nodes)) / num_nodes)
-        solver.Add(sym[k] <= solver.Sum(x[i, j, k] for i in range(num_nodes) for j in range(num_nodes)))
-
-    # Symmetry-breaking constraints
-    for k in range(1, m):
-        solver.Add(sym[k] <= sym[k - 1])
-
-
-
-    # Solve the problem
     start_time = time.time()
     status = solver.Solve()
     end_time = time.time()
     runtime = end_time - start_time
 
-    print("Solver Statistics:")
-    print(f"  Number of variables: {solver.NumVariables()}")
-    print(f"  Number of constraints: {solver.NumConstraints()}")
-    print(f"  Wall time: {solver.WallTime()} ms")
-    print(f"  Iterations: {solver.Iterations()}")
-    # Check if any solution was found
     if status in (pywraplp.Solver.OPTIMAL, pywraplp.Solver.FEASIBLE):
-        print(f"Solution found with maximum distance: {solver.Objective().Value()}")
-
-        # Print the solution for each courier
-        for k in range(m):
-            items = set()
-            route = []
-            for i in range(num_nodes):
-                for j in range(num_nodes):
-                    if x[i, j, k].solution_value() > 0.5:
-                        route.append((i, j))
-                        if j != n:
-                            items.add(j)  # Items correspond to customer nodes
-            print(f"Courier {k + 1}: delivers items {sorted(items)} with distance {y[k].solution_value()}")
-            print(f"  Route: {route}")
-
-        # Check if the solution is optimal
-        if status == pywraplp.Solver.OPTIMAL:
-            print("The solution is optimal.")
-        else:
-            print("The solution is not optimal, but it is the best found within the time limit.")
-    else:
-        print("No feasible solution found.")
         
+        max_dist = solver.Objective().Value()
+        solution = []
 
+        for k in range(m):  
+            route = []
+            current_node = n  
+            while True:
+                found_next = False
+                for j in range(num_nodes):
+                    if x[current_node, j, k].solution_value() > 0.5:  # If edge is part of the route
+                        if j != n:  
+                            route.append(j + 1)
+                        current_node = j
+                        found_next = True
+                        break
+                if not found_next or current_node == n:
+                    break  # End of the route or returned to depot
+            solution.append(route)
 
+        return  {
+                "time": int(runtime) if runtime < timeout else int(timeout),
+                "optimal": status == pywraplp.Solver.OPTIMAL,
+                "obj": round(max_dist),
+                "sol": solution  
+            }
+    return None
 
-instance_file = 'a/Instances/inst13.dat'  # Format filenames like inst01.dat
-print(f"Processing {instance_file}...")
-solve_mcp(instance_file)
-print("\n" + "="*50 + "\n")
- 
+def run_batch_instances(instance_dir, output_dir, timeout=300):
+    """Runs the solver on all instances in a directory and saves results in JSON format."""
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    instance_files = sorted([f for f in os.listdir(instance_dir) if f.endswith('.dat')])
+    instances_to_include = [13] #list(range(1, 11))+ [13,16] 
+
+    for instance_file in instance_files:
+        instance_number = int(''.join(filter(str.isdigit, instance_file)))
+        
+        # Check if the instance number is in the list of desired instances
+        if instance_number not in instances_to_include:
+            continue
+
+        instance_path = os.path.join(instance_dir, instance_file)
+        print(f"Processing {instance_path}...")
+
+        solvers = ["CBC", "SCIP"]
+        try:
+            results = {}
+            for solver in solvers:
+                res = solve_mcp(instance_path, solver)
+                if(res != None):
+                    results[solver] = solve_mcp(instance_path, solver)
+
+            instance_name = os.path.splitext(instance_file)[0]
+            instance_output_dir = os.path.join(output_dir, instance_name)
+
+            os.makedirs(instance_output_dir, exist_ok=True)
+
+            output_file = os.path.join(instance_output_dir, f"{instance_name}.json")
+            with open(output_file, 'w') as f:
+                json.dump(results, f, indent=4)
+
+            print(f"Result saved to {output_file}")
+        except Exception as e:
+            print(f"Error processing {instance_path}: {e}")
+
+if __name__ == "__main__":
+    instance_dir = "D:\\personal\\uni\\cdo\\project\\Instances"  
+    output_dir = "D:\\personal\\uni\\cdo\\project\\res\\MIP\\"      
+    dat_files_dir = 'D:\\personal\\uni\\cdo\\project\\Instances'
+    run_batch_instances(instance_dir, output_dir, timeout=300)
+
+    #check_solutions_with_external_script(instance_dir, output_dir)
