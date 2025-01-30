@@ -127,7 +127,7 @@ def run_minizinc_grid_search(dzn_files_dir, model_file, output_dir, formulas, ti
                     if result.status.has_solution():
                         solved_instances += 1
                         details.append((n, m, formula_name))
-                        logs.write(f"Success: {dzn_file} solved in {runtime:.2f} seconds with restarts={restarts}\n")
+                        logs.write(f"Success: {dzn_file} solved in {runtime:.2f} seconds with restarts={restarts}. Objective: {result.solution.objective}\n")
                     else:
                         logs.write(f"{dzn_file} ran but no solution was found within the time limit with restarts={restarts}\n")
 
@@ -175,6 +175,10 @@ formulas = {
     "2*m": lambda n, m: 2 * m,
     "2*n*m": lambda n, m: 2 * n * m,
     "2*(n+m)": lambda n, m: 2 * (n + m),
+    "3*n": lambda n, m: 3 * n,
+    "3*m": lambda n, m: 3 * m,
+    "3*n*m": lambda n, m: 3 * n * m,
+    "3*(n+m)": lambda n, m: 3 * (n + m),
     "5*n": lambda n, m: 5 * n,
     "5*m": lambda n, m: 5 * m,
     "5*n*m": lambda n, m: 5 * n * m,

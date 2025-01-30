@@ -77,6 +77,7 @@ constraint
 
 solve
 :: restart_luby(n*m) 
+:: relax_and_reconstruct([x[i, j] | i in 1..m, j in 1..n+1], 80) % Relax 80% of the routes
 :: int_search(x, dom_w_deg, indomain_split)   % Relax 50% of the decision variables
 
 minimize traveled_max_dist;
