@@ -13,34 +13,35 @@ set_param("smt.random_seed", 42)
 def run_smt(instance, timeout, sb=False):
     generation_start_time = time_clock()
 
-    # Build the SMT model
-    o, x, max_distance = stm_model(instance, sb)
+    # Build SMT model
+    optimizer, position_matrix, max_dist = stm_model(instance, sb)
     generation_duration = time_clock() - generation_start_time
-    o.set("timeout", int(timeout - generation_duration) * 1000)
+    optimizer.set("timeout", int(timeout - generation_duration) * 1000)
 
     # Minimize the objective
-    obj = o.minimize(max_distance)
-    res = o.check()  # Check satisfiability
+    obj = optimizer.minimize(max_dist)
+    res = optimizer.check()
     final_time = int(time_clock() - generation_start_time)
 
     if res == sat:
         try:
             # Format the solution if satisfiable
-            result_formatted = format_solution(instance, o.model(), x)
+            result_formatted = get_sol(instance, optimizer.model(), position_matrix)
             return result_formatted, True, obj.value(), final_time
         except Exception as e:
             return str(e), False, obj.value()
     elif res == unknown:
         try:
-            model = o.model()
+            model = optimizer.model()
             if model:  # Check if a model exists
                 # Format the partial solution
-                result_formatted = format_solution(instance, model, x)
-                best_objective = model.eval(max_distance, model_completion=True)
+                result_formatted = get_sol(instance, model, position_matrix)
+                best_objective = model.eval(max_dist, model_completion=False)
+                print(max_dist)
                 return (
                     result_formatted,
                     False,
-                    best_objective.as_long() if best_objective.is_int() else float(best_objective.as_decimal(5)),
+                    best_objective.as_long(),
                     final_time
                 )
             else:
@@ -119,8 +120,8 @@ def run_single_instance(n):
         data = file.read()
     instance = data_parsing(data)
     solution_smt = run_smt(instance, timeout, False)
-    #solution_smt_sb = run_smt(instance, timeout, True)
-    solution_smt_sb = "unsat"
+    solution_smt_sb = run_smt(instance, timeout, True)
+    # solution_smt_sb = "unsat"
     if n < 10:
         save_solution(["smt", "smt_sb"], [solution_smt, solution_smt_sb], f'res/SMT/inst0{n}/inst0{n}.json')
     else:
@@ -150,7 +151,7 @@ args = parser.parse_args()
 instance_number = -1
 # Determine the instances to run
 if args.instance == -1:
-    #run_all_instances()
+    run_all_instances()
     check_solutions_with_external_script(instance_dir, output_dir) 
 elif 1 <= args.instance <= 21:
     instance_number = args.instance

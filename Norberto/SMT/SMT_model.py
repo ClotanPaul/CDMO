@@ -6,17 +6,17 @@ import numpy as np
 # computable by the model
 def data_parsing(data):
     text = data.split("\n")
-    num_reg = r"(\d+)"
-    text = [x for x in text if x != ""]
-    text = [x.strip() for x in text]
-    m = int(re.findall(num_reg, text[0])[0])
-    n = int(re.findall(num_reg, text[1])[0])
-    l = [int(x) for x in re.findall(num_reg, text[2])]
-    s = [int(x) for x in re.findall(num_reg, text[3])]
-
+    fixed_re = r"(\d+)" 
+    text = [c for c in text if c != ""]
+    text = [c.strip() for c in text]
+    
+    m = int(re.findall(fixed_re, text[0])[0])
+    n = int(re.findall(fixed_re, text[1])[0])
+    l = [int(c) for c in re.findall(fixed_re, text[2])]
+    s = [int(c) for c in re.findall(fixed_re, text[3])]
     D = []
     for i in range(4, 4 + n + 1):
-        D.append([int(x) for x in re.findall(num_reg, text[i])])
+        D.append([int(c) for c in re.findall(fixed_re, text[i])])
 
     return {
         "m": m,
@@ -29,19 +29,19 @@ def data_parsing(data):
 # Custom function to get the maximum value of a list of values
 def max_comparison(value):
     m = value[0]
-    for x in value[1:]:
-        m = If(x > m, x, m)
+    for i in value[1:]:
+        m = If(i > m, i, m)
     return m
 
 
-def get_list_of_values(ll, j):
-    return [If(x == j, 1, 0) for l in ll for x in l]
+def get_list_of_values(lst, j):
+    return [If(i == j, 1, 0) for l in lst for i in l]
 
 # Custom function to calculate the maximum distance a courier can travel
-def maxdist_calc(distances, pk_bound):
-    vertical_distance = np.sum(np.max(distances, axis=1))
-    sorted_distance = np.sum(sorted(distances.flatten(), reverse=True)[: pk_bound + 1])
-    max_dist = np.min([vertical_distance, sorted_distance])
+def maxdist_calc(dist, pk_bound):
+    vertical_dist = np.sum(np.max(dist, axis=1))
+    sorted_dist = np.sum(sorted(dist.flatten(), reverse=True)[: pk_bound + 1])
+    max_dist = np.min([vertical_dist, sorted_dist])
 
     return max_dist
 
@@ -51,72 +51,75 @@ def stm_model(instance, sb):
     n = instance["n"]  # packages
     l = instance["l"]  # loads of couriers
     s = instance["s"]  # sizes of couriers
+    dist = np.array(instance["D"])
+    
     pk_bound = n # max number of packages a courier can carry
-
-    distances = np.array(instance["D"])
     
     # Calculate the minimum and maximum values for the decision variables
-    min_load = np.min(s)
-    max_load = min(np.max(l), np.sum(sorted(s, reverse=True)[:pk_bound]))
-    max_dist = maxdist_calc(distances, pk_bound)
-    min_solution = np.max([distances[n, j] + distances[j, n] for j in range(n)])
+    min_l = np.min(s)
+    max_l = min(np.max(l), np.sum(sorted(s, reverse=True)[:pk_bound]))
+    max_dist = maxdist_calc(dist, pk_bound)
+    lower_bound = np.max([dist[n, j] + dist[j, n] for j in range(n)])
+    upper_bound = np.sum(np.max(dist, axis=1))
     
     # Cast the values to z3 IntVal
-    max_load = IntVal(f"{max_load}")
-    min_load = IntVal(f"{min_load}")
+    max_l = IntVal(f"{max_l}")
+    min_l = IntVal(f"{min_l}")
     max_dist = IntVal(f"{max_dist}")
-    min_solution = IntVal(f"{min_solution}")
+    lower_bound = IntVal(f"{lower_bound}")
+    upper_bound = IntVal(f"{upper_bound}")
+    
 
-    o = Optimize()
+    z3_optimizer = Optimize()
     
     #Decision variables
 
-    # Main decision variables: x[i][k] are the packages carried by courier i in the k-th step
-    x = [
-        [Int(f"x_{i}_{k}") for k in range(0, pk_bound + 1)]
+    # Main decision variables: position_matrix[i][k] are the packages carried by courier i in the k-th step
+    position_matrix = [
+        [Int(f"position_matrix_{i}_{k}") for k in range(0, pk_bound + 1)]
         for i in range(m)
     ]
-
-    # This variable is used to store the distance travelled by each courier
-    y = [Int(f"y_{i}") for i in range(m)]
 
     # This variable is used to store the load of each courier
     load = [Int(f"load_{i}") for i in range(m)]
 
+    # This variable is used to store the distance travelled by each courier
+    cour_dists = [Int(f"cour_dists_{i}") for i in range(m)]
+
     # The value to minimize
-    max_distance = Int(f"max_distance")
+    max_dist = Int(f"max_dist")
 
     # We need to indicize the distances array to be able to use it in the model
-    distances = Array("distances", IntSort(), ArraySort(IntSort(), IntSort()))
+    dist = Array("dist", IntSort(), ArraySort(IntSort(), IntSort()))
     for j in range(n + 1):
         for j1 in range(n + 1):
-            o.add(distances[j][j1] == instance["D"][j][j1])
+            z3_optimizer.add(dist[j][j1] == instance["D"][j][j1])
 
-    # we define s as a z3 array because it is easier to indicize
+    # Define s as a z3 array
     s = Array("s", IntSort(), IntSort())
     for j in range(n):
-        o.add(s[j] == instance["s"][j])
-    o.add(s[n] == 0)
+        z3_optimizer.add(s[j] == instance["s"][j])
+    z3_optimizer.add(s[n] == 0)
 
     #Constraints
 
-    # Possible values for x[i][k] are between 0 and n
-    o.add(
+    # Possible values for position_matrix[i][k] are between 0 and n
+    z3_optimizer.add(
         [
-            And(x[i][k] >= 0, x[i][k] <= n)
+            And(position_matrix[i][k] >= 0, position_matrix[i][k] <= n)
             for i in range(m)
             for k in range(1, pk_bound)
         ]
     )
-    o.add([And(x[i][0] == n, x[i][pk_bound] == n) for i in range(m)])
+    z3_optimizer.add([And(position_matrix[i][0] == n, position_matrix[i][pk_bound] == n) for i in range(m)])
 
     # Each position in the array must be different, unless it is the last one
     for j in range(n):
-        o.add(
+        z3_optimizer.add(
             [
                 Sum(
                     get_list_of_values(
-                        [[x[i][k] for k in range(1, pk_bound + 1)] for i in range(m)],
+                        [[position_matrix[i][k] for k in range(1, pk_bound + 1)] for i in range(m)],
                         j,
                     )
                 )
@@ -126,62 +129,62 @@ def stm_model(instance, sb):
 
     # For each courier, their maximum load must be respected given the sum of the packages they carry
     for i in range(m):
-        o.add(load[i] == Sum([s[x[i][k]] for k in range(1, pk_bound)]))
-        o.add(load[i] <= l[i])
+        z3_optimizer.add(load[i] == Sum([s[position_matrix[i][k]] for k in range(1, pk_bound)]))
+        z3_optimizer.add(load[i] <= l[i])
 
     # The loads must be in range
     for i in range(m):
-        o.add(And(load[i] >= min_load, load[i] <= max_load))
+        z3_optimizer.add(And(load[i] >= min_l, load[i] <= max_l))
 
     # Total items size less than total couriers capacity
-    o.add(Sum([load[i] for i in range(m)]) >= Sum([s[j] for j in range(n)]))
+    z3_optimizer.add(Sum([load[i] for i in range(m)]) >= Sum([s[j] for j in range(n)]))
+    
+    # Once a courier returns to the depot, it can't deliver other packages
+    for i in range(m):
+        for k in range(1, pk_bound):
+            z3_optimizer.add(Implies(position_matrix[i][k] == n, position_matrix[i][k + 1] == n))
 
-    # Symmetry breaking constraints
+    # Symmetry breaking constraint
     
     if sb:
-        # Once a courier returns to the depot, it cant deliver other packages
-        for i in range(m):
-            for k in range(1, pk_bound):
-                o.add(Implies(x[i][k] == n, x[i][k + 1] == n))
-
         # Lexycographic constraint between couriers with the same capacity
         for i1 in range(m - 1):
             for i2 in range(i1 + 1, m):
-                o.add(
+                z3_optimizer.add(
                     Implies(
                         l[i1] == l[i2],
-                        If(x[i1][1] != n, x[i1][1], -1)
-                        <= If(x[i1][1] != n, x[i1][1], -1),
+                        If(position_matrix[i1][1] != n, position_matrix[i1][1], -1)
+                        <= If(position_matrix[i1][1] != n, position_matrix[i1][1], -1),
                     )
                 )
         
     # Reach objective function
 
-    # distances array
+    #Add distance travelled by each courier
     for i in range(m):
-        o.add(y[i] == Sum([distances[x[i][k]][x[i][k + 1]] for k in range(0, pk_bound)]))
+        z3_optimizer.add(cour_dists[i] == Sum([dist[position_matrix[i][k]][position_matrix[i][k + 1]] for k in range(0, pk_bound)]))
 
-    # bound to distances array
+    # Add constraint that each distance travelled by a courier must be less than the maximum distance
     for i in range(m):
-        o.add(y[i] <= max_dist)
+        z3_optimizer.add(cour_dists[i] <= max_dist)
 
-    # variable to minimize
-    o.add(max_distance == max_comparison(y))
+    # Set the minimization objective
+    z3_optimizer.add(max_dist == max_comparison(cour_dists))
 
-    # bound the variable to minimize
-    o.add(max_distance >= min_solution)
+    # Set the lower bound for the objective
+    z3_optimizer.add(max_dist >= lower_bound, max_dist <= upper_bound)
 
-    return o, x, max_distance
+    return z3_optimizer, position_matrix, max_dist
 
 
-def format_solution(instance, model, x):
-    m = instance["m"]  # couriers
-    n = instance["n"]  # packages
-    pk_bound = n  # max number of packages a courier can carry
-    step_courier = []
+def get_sol(instance, model, position_matrix):
+    m = instance["m"]
+    n = instance["n"]  
+    pk_bound = n  
+    next_step = []
     for i in range(m):
-        step_courier.append([])
-        for k in range(1, pk_bound):
-            if model.eval(x[i][k]).as_long() != n:
-                step_courier[i].append(model.eval(x[i][k]).as_long() + 1)
-    return step_courier
+        next_step.append([])
+        for j in range(1, pk_bound):
+            if model.eval(position_matrix[i][j]).as_long() != n:
+                next_step[i].append(model.eval(position_matrix[i][j]).as_long() + 1)
+    return next_step
