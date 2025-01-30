@@ -5,13 +5,14 @@ import json
 import time
 import subprocess
 import math
+import argparse
 
 def check_solutions_with_external_script(input_folder, results_folder):
     """
     Calls the external solution checker script using subprocess to check all generated solutions.
     """
     try:
-        subprocess.run(["python3", "D:/personal/uni/cdo/project/solution_checker.py", input_folder, results_folder], check=True)
+        subprocess.run(["python3", "solution_checker.py", input_folder, results_folder], check=True)
     except subprocess.CalledProcessError as e:
         print(f"Solution checker failed with error: {str(e)}")
 
@@ -128,7 +129,6 @@ def solve_mcp(file_path, solver_type, timeout = 300):
         solver.Add(y[k] == total_distance)
         solver.Add(z >= y[k])
 
-
     start_time = time.time()
     status = solver.Solve()
     end_time = time.time()
@@ -163,13 +163,12 @@ def solve_mcp(file_path, solver_type, timeout = 300):
             }
     return None
 
-def run_batch_instances(instance_dir, output_dir, timeout=300):
+def run_batch_instances(instance_dir, output_dir, instances_to_include, timeout=300):
     """Runs the solver on all instances in a directory and saves results in JSON format."""
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
     instance_files = sorted([f for f in os.listdir(instance_dir) if f.endswith('.dat')])
-    instances_to_include = [1] #list(range(1, 11))+ [13,16] 
 
     for instance_file in instance_files:
         instance_number = int(''.join(filter(str.isdigit, instance_file)))
@@ -189,6 +188,7 @@ def run_batch_instances(instance_dir, output_dir, timeout=300):
                 if(res != None):
                     results[solver] = solve_mcp(instance_path, solver)
 
+            print(results)
             instance_name = os.path.splitext(instance_file)[0]
             instance_output_dir = os.path.join(output_dir, instance_name)
 
@@ -203,9 +203,23 @@ def run_batch_instances(instance_dir, output_dir, timeout=300):
             print(f"Error processing {instance_path}: {e}")
 
 if __name__ == "__main__":
-    instance_dir = "Instances copy"  
-    output_dir = "res/MIP/"      
-    dat_files_dir = '../Instances'
-    run_batch_instances(instance_dir, output_dir, timeout=300)
+    parser = argparse.ArgumentParser(description="Run MIP instances.")
+    parser.add_argument("instance", type=int, nargs="?", default=-1, help="The instance number to run (1-21)")
 
-    #check_solutions_with_external_script(instance_dir, output_dir)
+    args = parser.parse_args()
+    instance_number = -1
+    # Determine the instances to run
+    if args.instance == -1:
+        instance_number = list(range(1, 11)) + [13,16] 
+    elif 1 <= args.instance <= 21:
+        instance_number = [args.instance]  # Run only the specified instance
+    else:
+        print("Error: Instance number must be between 1 and 21.")
+        exit(1)
+
+    instance_dir = "Instances_copy"  
+    output_dir = "res/MIP/"      
+    dat_files_dir = 'Instances'
+    run_batch_instances(instance_dir, output_dir, instance_number, timeout=300)
+
+    check_solutions_with_external_script(instance_dir, output_dir)
