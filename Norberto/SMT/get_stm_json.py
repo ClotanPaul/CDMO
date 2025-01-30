@@ -87,9 +87,21 @@ def all_solutions(solvers, solutions):
     return output_data
 
 def save_solution(solvers ,solutions, path):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     output_data = all_solutions(solvers, solutions)
     with open(path, 'w') as file:
         if output_data != []:
+            print(output_data)
+            json.dump(output_data, file, indent=4)
+
+def save_solution(solvers, solutions, path):
+    directory = os.path.dirname(path)
+    print(directory)
+    os.makedirs(directory, exist_ok=True)  # Ensure the directory exists
+    
+    output_data = all_solutions(solvers, solutions)
+    with open(path, 'w') as file:  # Open file only after ensuring the directory exists
+        if output_data:
             print(output_data)
             json.dump(output_data, file, indent=4)
             
