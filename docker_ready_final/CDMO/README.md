@@ -48,11 +48,14 @@ To run a specific instance separately, follow these steps:
 The results of the executed instances will be saved in the following directory:
 
 ```
-docker\CDMO\code
+docker\CDMO\code\res
 ```
+
+Alternatively, you can check the results in the docker file at the path:
+```
+/src/code
+```
+Under the src folder.
 
 You can access this directory after the Docker container has finished running.
 
----
-
-If you encounter any issues or have questions, feel free to reach out to the project maintainers.
