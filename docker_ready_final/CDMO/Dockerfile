@@ -12,4 +12,4 @@ RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
 WORKDIR /src/code
 
-CMD ["python3", "run_instance.py"]
+CMD ["./run_all.sh"]

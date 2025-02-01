@@ -20,7 +20,7 @@ def read_dat_file(file_path):
     """Parse the .dat file to extract instance data."""
     with open(file_path, 'r') as file:
         lines = file.readlines()
-    
+
     # Read the number of couriers and items
     m = int(lines[0].strip())
     n = int(lines[1].strip())
@@ -60,7 +60,7 @@ def solve_mcp(file_path, solver_type, timeout = 300):
     ))
     upper_bound = math.ceil(sum(
         max(D[i, j] for j in range(num_nodes)) for i in range(num_nodes)
-    ) + max(D[n, j] + D[j, n] for j in range(num_nodes - 1)) )
+    ))
 
     y = [solver.IntVar(0, upper_bound, f'y_{k}') for k in range(m)]
     z = solver.IntVar(lower_bound, upper_bound, 'z')
@@ -217,8 +217,8 @@ if __name__ == "__main__":
         print("Error: Instance number must be between 1 and 21.")
         exit(1)
 
-    instance_dir = "../Instances"  
-    output_dir = "../res/MIP/"      
+    instance_dir = "../Instances"
+    output_dir = "../res/MIP/"
 
     run_batch_instances(instance_dir, output_dir, instance_number, timeout=300)
 
